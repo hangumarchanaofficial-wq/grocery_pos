@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -18,7 +18,7 @@
     "next": "^16.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@prisma/client": "^7.6.0",
+    "@prisma/client": "^6.16.2",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
     "zustand": "^5.0.0",
@@ -31,7 +31,7 @@
     "simple-statistics": "^7.8.0"
   },
   "devDependencies": {
-    "prisma": "^7.6.0",
+    "prisma": "^6.16.2",
     "typescript": "^5.7.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
