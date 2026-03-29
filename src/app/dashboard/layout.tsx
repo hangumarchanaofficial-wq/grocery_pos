@@ -1,7 +1,3 @@
-// ============================================================
-// Dashboard Layout - Sidebar + Content + Mobile Nav
-// ============================================================
-
 'use client';
 
 import { useState } from 'react';
@@ -9,38 +5,52 @@ import Sidebar from '@/components/layout/Sidebar';
 import TopBar from '@/components/layout/TopBar';
 import MobileNav from '@/components/layout/MobileNav';
 import ProtectedRoute from '@/components/layout/ProtectedRoute';
+import Footer from '@/components/layout/Footer';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    return (
-        <ProtectedRoute>
-            <div className="app-shell flex min-h-screen">
-                <div className="hidden lg:block">
-                    <Sidebar />
-                </div>
+  return (
+    <ProtectedRoute>
+      <div className="flex h-screen bg-[#0a0a0f]">
+        {/* Sidebar - desktop */}
+        <div className="hidden lg:block">
+          <Sidebar />
+        </div>
 
-                {mobileMenuOpen && (
-                    <>
-                        <div
-                            className="fixed inset-0 z-50 bg-slate-950/70 lg:hidden"
-                            onClick={() => setMobileMenuOpen(false)}
-                        />
-                        <div className="fixed inset-y-0 left-0 z-50 w-72 lg:hidden">
-                            <Sidebar />
-                        </div>
-                    </>
-                )}
-
-                <main className="flex min-h-screen flex-1 flex-col">
-                    <TopBar onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
-                    <div className="flex-1 px-4 pb-24 pt-5 lg:px-6 lg:pb-8 lg:pt-6">
-                        {children}
-                    </div>
-                </main>
-
-                <MobileNav />
+        {/* Mobile sidebar overlay */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-40 lg:hidden">
+            <div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            <div className="relative z-50 h-full w-72">
+              <Sidebar />
             </div>
-        </ProtectedRoute>
-    );
+          </div>
+        )}
+
+        {/* Main area */}
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <TopBar onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
+
+          <main className="flex-1 overflow-y-auto">
+            <div className="min-h-full flex flex-col">
+              {/* Page content */}
+              <div className="flex-1 p-4 pb-24 sm:p-6 lg:p-8">
+                {children}
+              </div>
+
+              {/* Footer */}
+              <Footer />
+            </div>
+          </main>
+
+          {/* Mobile bottom nav */}
+          <MobileNav />
+        </div>
+      </div>
+    </ProtectedRoute>
+  );
 }

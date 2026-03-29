@@ -1,5 +1,5 @@
 // ============================================================
-// Product Table — Displays all products with actions
+// Product Table — Premium dark-themed product grid
 // ============================================================
 
 'use client';
@@ -11,116 +11,138 @@ import { formatCurrency } from '@/lib/utils';
 import { CATEGORIES } from '@/lib/constants';
 
 interface Product {
-    id: string;
-    name: string;
-    barcode: string | null;
-    category: string;
-    price: number;
-    costPrice: number;
-    quantity: number;
-    unit: string;
-    minStock: number;
-    expiryDate: string | null;
+  id: string;
+  name: string;
+  barcode: string | null;
+  category: string;
+  price: number;
+  costPrice: number;
+  quantity: number;
+  unit: string;
+  minStock: number;
+  expiryDate: string | null;
 }
 
 interface ProductTableProps {
-    products: Product[];
-    onEdit: (product: Product) => void;
-    onDelete: (id: string) => void;
-    userRole: string;
+  products: Product[];
+  onEdit: (product: Product) => void;
+  onDelete: (id: string) => void;
+  userRole: string;
 }
 
 export default function ProductTable({ products, onEdit, onDelete, userRole }: ProductTableProps) {
-    const getCategoryEmoji = (cat: string) => {
-        return CATEGORIES.find((c) => c.value === cat)?.emoji || '📦';
-    };
+  const getCategoryEmoji = (cat: string) =>
+    CATEGORIES.find((c) => c.value === cat)?.emoji || '📦';
 
-    const getStockBadge = (product: Product) => {
-        if (product.quantity === 0) return <Badge variant="danger">Out of Stock</Badge>;
-        if (product.quantity <= product.minStock) return <Badge variant="warning">Low Stock</Badge>;
-        return <Badge variant="success">In Stock</Badge>;
-    };
+  const getStockBadge = (product: Product) => {
+    if (product.quantity === 0) return <Badge variant="danger">Out of Stock</Badge>;
+    if (product.quantity <= product.minStock) return <Badge variant="warning">Low Stock</Badge>;
+    return <Badge variant="success">In Stock</Badge>;
+  };
 
-    const getExpiryBadge = (expiryDate: string | null) => {
-        if (!expiryDate) return null;
-        const days = Math.ceil((new Date(expiryDate).getTime() - Date.now()) / 86400000);
-        if (days <= 0) return <Badge variant="danger">Expired</Badge>;
-        if (days <= 3) return <Badge variant="warning">{days}d left</Badge>;
-        return null;
-    };
+  const getExpiryBadge = (expiryDate: string | null) => {
+    if (!expiryDate) return null;
+    const days = Math.ceil((new Date(expiryDate).getTime() - Date.now()) / 86400000);
+    if (days <= 0) return <Badge variant="danger">Expired</Badge>;
+    if (days <= 3) return <Badge variant="warning">{days}d left</Badge>;
+    return null;
+  };
 
+  if (products.length === 0) {
     return (
-        <div className="overflow-x-auto rounded-xl border border-gray-200">
-            <table className="w-full text-sm">
-                <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="px-4 py-3 text-left font-medium text-gray-600">Product</th>
-                    <th className="px-4 py-3 text-left font-medium text-gray-600">Category</th>
-                    <th className="px-4 py-3 text-right font-medium text-gray-600">Price</th>
-                    <th className="px-4 py-3 text-right font-medium text-gray-600">Cost</th>
-                    <th className="px-4 py-3 text-center font-medium text-gray-600">Stock</th>
-                    <th className="px-4 py-3 text-center font-medium text-gray-600">Status</th>
-                    <th className="px-4 py-3 text-center font-medium text-gray-600">Actions</th>
-                </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                {products.map((product) => (
-                    <tr key={product.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3">
-                            <div>
-                                <p className="font-medium text-gray-900">{product.name}</p>
-                                {product.barcode && (
-                                    <p className="text-xs text-gray-400">{product.barcode}</p>
-                                )}
-                            </div>
-                        </td>
-                        <td className="px-4 py-3">
-                <span className="text-sm">
-                  {getCategoryEmoji(product.category)} {product.category}
-                </span>
-                        </td>
-                        <td className="px-4 py-3 text-right font-medium">
-                            {formatCurrency(product.price)}
-                        </td>
-                        <td className="px-4 py-3 text-right text-gray-500">
-                            {formatCurrency(product.costPrice)}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                <span className="font-medium">
-                  {product.quantity} {product.unit}
-                </span>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                            <div className="flex flex-col items-center gap-1">
-                                {getStockBadge(product)}
-                                {getExpiryBadge(product.expiryDate)}
-                            </div>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                            <div className="flex items-center justify-center gap-1">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => onEdit(product)}
-                                >
-                                    <Edit size={15} />
-                                </Button>
-                                {userRole === 'OWNER' && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => onDelete(product.id)}
-                                        className="text-red-500 hover:bg-red-50"
-                                    >
-                                        <Trash2 size={15} />
-                                    </Button>
-                                )}
-                            </div>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-        </div>
+      <div className="glass-panel flex h-48 items-center justify-center rounded-[28px] text-slate-500">
+        No products found. Try adjusting your filters.
+      </div>
     );
+  }
+
+  return (
+    <div className="glass-panel overflow-hidden rounded-[28px]">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-white/8">
+              <th className="px-5 py-4 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Product
+              </th>
+              <th className="px-5 py-4 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Category
+              </th>
+              <th className="px-5 py-4 text-right text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Price
+              </th>
+              <th className="hidden px-5 py-4 text-right text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 md:table-cell">
+                Cost
+              </th>
+              <th className="px-5 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Stock
+              </th>
+              <th className="px-5 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Status
+              </th>
+              <th className="px-5 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/[0.04]">
+            {products.map((product) => (
+              <tr
+                key={product.id}
+                className="transition-colors hover:bg-white/[0.02]"
+              >
+                <td className="px-5 py-4">
+                  <div>
+                    <p className="font-medium text-slate-100">{product.name}</p>
+                    {product.barcode && (
+                      <p className="mt-0.5 font-mono text-xs text-slate-500">{product.barcode}</p>
+                    )}
+                  </div>
+                </td>
+                <td className="px-5 py-4">
+                  <span className="text-sm text-slate-300">
+                    {getCategoryEmoji(product.category)} {product.category}
+                  </span>
+                </td>
+                <td className="px-5 py-4 text-right font-medium text-slate-100">
+                  {formatCurrency(product.price)}
+                </td>
+                <td className="hidden px-5 py-4 text-right text-slate-400 md:table-cell">
+                  {formatCurrency(product.costPrice)}
+                </td>
+                <td className="px-5 py-4 text-center">
+                  <span className="font-mono font-medium text-slate-200">
+                    {product.quantity} <span className="text-slate-500">{product.unit}</span>
+                  </span>
+                </td>
+                <td className="px-5 py-4 text-center">
+                  <div className="flex flex-col items-center gap-1.5">
+                    {getStockBadge(product)}
+                    {getExpiryBadge(product.expiryDate)}
+                  </div>
+                </td>
+                <td className="px-5 py-4 text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => onEdit(product)}>
+                      <Edit size={15} />
+                    </Button>
+                    {userRole === 'OWNER' && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onDelete(product.id)}
+                        className="text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                      >
+                        <Trash2 size={15} />
+                      </Button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }

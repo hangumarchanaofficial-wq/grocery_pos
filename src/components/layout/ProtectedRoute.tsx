@@ -1,5 +1,5 @@
 // ============================================================
-// Protected Route wrapper — redirects if not authenticated
+// Protected Route wrapper — Dark-themed
 // ============================================================
 
 'use client';
@@ -9,27 +9,27 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
-    const { user, loading } = useAuth();
-    const router = useRouter();
+  const { user, loading } = useAuth();
+  const router = useRouter();
 
-    useEffect(() => {
-        if (!loading && !user) {
-            router.push('/');
-        }
-    }, [user, loading, router]);
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="flex flex-col items-center gap-3">
-                    <div className="w-10 h-10 border-4 border-brand-600 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-500">Loading...</p>
-                </div>
-            </div>
-        );
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/');
     }
+  }, [user, loading, router]);
 
-    if (!user) return null;
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-brand-400/30 border-t-brand-400" />
+          <p className="text-sm text-slate-500">Loading system...</p>
+        </div>
+      </div>
+    );
+  }
 
-    return <>{children}</>;
+  if (!user) return null;
+
+  return <>{children}</>;
 }

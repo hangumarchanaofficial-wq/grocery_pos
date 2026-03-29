@@ -1,9 +1,9 @@
 // ============================================================
-// Root Layout — App shell with providers
+// Root Layout — Dark-only, no theme switching
 // ============================================================
 
 import type { Metadata } from 'next';
-import { Space_Grotesk, IBM_Plex_Mono } from 'next/font/google';
+import { Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
@@ -12,38 +12,42 @@ const spaceGrotesk = Space_Grotesk({
   variable: '--font-sans',
 });
 
-const ibmPlexMono = IBM_Plex_Mono({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   variable: '--font-mono',
 });
 
 export const metadata: Metadata = {
-  title: 'GroceryPOS — Smart Billing System',
-  description: 'AI-powered point of sale system for grocery stores',
+  title: 'GroceryPOS — Retail Command System',
+  description: 'AI-powered point of sale for modern grocery retail',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-      <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} font-sans antialiased`}>
-      {children}
-      <Toaster
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+      >
+        {children}
+        <Toaster
           position="top-right"
           toastOptions={{
             duration: 3000,
             style: {
-              borderRadius: '18px',
-              padding: '14px 16px',
-              fontSize: '14px',
-              background: '#111827',
-              color: '#f8fafc',
-              border: '1px solid rgba(148, 163, 184, 0.18)',
-              boxShadow: '0 24px 60px rgba(2, 6, 23, 0.38)',
+              borderRadius: '16px',
+              padding: '14px 18px',
+              fontSize: '13px',
+              fontWeight: 500,
+              background: 'rgba(15, 25, 48, 0.95)',
+              color: '#f1f5f9',
+              border: '1px solid rgba(148, 163, 184, 0.1)',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.4)',
             },
           }}
-      />
+        />
       </body>
-      </html>
+    </html>
   );
 }
