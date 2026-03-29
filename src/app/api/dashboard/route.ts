@@ -1,133 +1,88 @@
-// ============================================================
-// GET /api/dashboard — Dashboard summary statistics
-// Returns today's sales, profit, low stock, expiry alerts
-// ============================================================
+import { adminClient } from '@/lib/supabase/admin';
+import { getUserFromRequest, errorResponse, successResponse } from '@/lib/auth';
 
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getUserFromRequest } from '@/lib/auth';
-import { errorResponse, successResponse } from '@/lib/utils';
+export async function GET() {
+  const user = await getUserFromRequest();
+  if (!user) return errorResponse('Unauthorized', 401);
 
-export async function GET(req: NextRequest) {
-    try {
-        const user = getUserFromRequest(req);
-        if (!user) return errorResponse('Unauthorized', 401);
+  const now          = new Date();
+  const todayStart   = new Date(now); todayStart.setHours(0, 0, 0, 0);
+  const todayEnd     = new Date(now); todayEnd.setHours(23, 59, 59, 999);
+  const sevenAgo     = new Date(Date.now() - 7  * 86400000);
+  const threeAhead   = new Date(Date.now() + 3  * 86400000);
 
-        const todayStart = new Date();
-        todayStart.setHours(0, 0, 0, 0);
-        const todayEnd = new Date();
-        todayEnd.setHours(23, 59, 59, 999);
+  const [
+    { data: todayBills },
+    { count: totalProducts },
+    { data: allProducts },
+    { data: expiringProducts },
+    { data: recentBills },
+    { data: last7Days },
+  ] = await Promise.all([
+    adminClient.from('bills')
+      .select('total, bill_items(total, cost_price, quantity)')
+      .gte('created_at', todayStart.toISOString())
+      .lte('created_at', todayEnd.toISOString()),
+    adminClient.from('products')
+      .select('*', { count: 'exact', head: true }).eq('active', true),
+    adminClient.from('products')
+      .select('id, name, quantity, min_stock, category').eq('active', true),
+    adminClient.from('products')
+      .select('id, name, expiry_date, quantity, category')
+      .eq('active', true)
+      .lte('expiry_date', threeAhead.toISOString())
+      .gte('expiry_date', now.toISOString()),
+    adminClient.from('bills')
+      .select('id, bill_number, total, created_at, customers(name), users(name)')
+      .order('created_at', { ascending: false }).limit(5),
+    adminClient.from('bills')
+      .select('total, created_at, bill_items(cost_price, quantity, total)')
+      .gte('created_at', sevenAgo.toISOString()),
+  ]);
 
-        // Run all queries in parallel for speed
-        const [
-            todayBills,
-            totalProducts,
-            lowStockProducts,
-            expiringProducts,
-            recentBills,
-            last7DaysSales,
-        ] = await Promise.all([
-            // Today's bills with items (for profit calculation)
-            prisma.bill.findMany({
-                where: { createdAt: { gte: todayStart, lte: todayEnd } },
-                include: { items: true },
-            }),
+  const bills       = todayBills || [];
+  const todaySales  = bills.reduce((s: number, b: { total: number }) => s + b.total, 0);
+  const todayProfit = bills.reduce((s: number, b: { bill_items: { total: number; cost_price: number; quantity: number }[] }) => {
+    const rev  = b.bill_items.reduce((a, i) => a + i.total, 0);
+    const cost = b.bill_items.reduce((a, i) => a + i.cost_price * i.quantity, 0);
+    return s + rev - cost;
+  }, 0);
 
-            // Total active products
-            prisma.product.count({ where: { active: true } }),
+  const actualLowStock = (allProducts || []).filter(
+    (p: { quantity: number; min_stock: number }) => p.quantity <= p.min_stock
+  );
 
-            // Low stock products (quantity <= minStock)
-            prisma.product.findMany({
-                where: {
-                    active: true,
-                    quantity: { lte: 10 }, // We'll filter precisely in code
-                },
-                select: { id: true, name: true, quantity: true, minStock: true, category: true },
-            }),
+  const salesByDay: Record<string, { sales: number; profit: number; bills: number }> = {};
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 86400000);
+    salesByDay[d.toISOString().slice(0, 10)] = { sales: 0, profit: 0, bills: 0 };
+  }
+  (last7Days || []).forEach((b: { total: number; created_at: string; bill_items: { total: number; cost_price: number; quantity: number }[] }) => {
+    const key = b.created_at.slice(0, 10);
+    if (!salesByDay[key]) return;
+    salesByDay[key].sales  += b.total;
+    salesByDay[key].bills  += 1;
+    salesByDay[key].profit += b.total - b.bill_items.reduce((s, i) => s + i.cost_price * i.quantity, 0);
+  });
 
-            // Products expiring within 3 days
-            prisma.product.findMany({
-                where: {
-                    active: true,
-                    expiryDate: {
-                        lte: new Date(Date.now() + 3 * 86400000), // 3 days from now
-                        gte: new Date(),
-                    },
-                },
-                select: { id: true, name: true, expiryDate: true, quantity: true, category: true },
-            }),
+  const chartData = Object.entries(salesByDay).map(([date, d]) => ({
+    date,
+    label: new Date(date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric' }),
+    ...d,
+  }));
 
-            // Last 5 bills for activity feed
-            prisma.bill.findMany({
-                include: {
-                    customer: { select: { name: true } },
-                    user: { select: { name: true } },
-                },
-                orderBy: { createdAt: 'desc' },
-                take: 5,
-            }),
-
-            // Last 7 days sales for chart
-            prisma.bill.findMany({
-                where: {
-                    createdAt: { gte: new Date(Date.now() - 7 * 86400000) },
-                },
-                select: { total: true, createdAt: true, items: { select: { costPrice: true, quantity: true, total: true } } },
-            }),
-        ]);
-
-        // Calculate today's stats
-        const todaySales = todayBills.reduce((sum, bill) => sum + bill.total, 0);
-        const todayProfit = todayBills.reduce((sum, bill) => {
-            const revenue = bill.items.reduce((s, item) => s + item.total, 0);
-            const cost = bill.items.reduce((s, item) => s + item.costPrice * item.quantity, 0);
-            return sum + (revenue - cost);
-        }, 0);
-
-        // Filter low stock accurately (quantity <= minStock)
-        const actualLowStock = lowStockProducts.filter((p) => p.quantity <= p.minStock);
-
-        // Build 7-day chart data
-        const salesByDay: Record<string, { sales: number; profit: number; bills: number }> = {};
-        for (let i = 6; i >= 0; i--) {
-            const date = new Date(Date.now() - i * 86400000);
-            const key = date.toISOString().slice(0, 10);
-            salesByDay[key] = { sales: 0, profit: 0, bills: 0 };
-        }
-
-        last7DaysSales.forEach((bill) => {
-            const key = bill.createdAt.toISOString().slice(0, 10);
-            if (salesByDay[key]) {
-                salesByDay[key].sales += bill.total;
-                salesByDay[key].bills += 1;
-                const cost = bill.items.reduce((s, item) => s + item.costPrice * item.quantity, 0);
-                const revenue = bill.items.reduce((s, item) => s + item.total, 0);
-                salesByDay[key].profit += revenue - cost;
-            }
-        });
-
-        const chartData = Object.entries(salesByDay).map(([date, data]) => ({
-            date,
-            label: new Date(date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric' }),
-            ...data,
-        }));
-
-        return successResponse({
-            stats: {
-                todaySales: Math.round(todaySales * 100) / 100,
-                todayBills: todayBills.length,
-                todayProfit: Math.round(todayProfit * 100) / 100,
-                totalProducts,
-                lowStockCount: actualLowStock.length,
-                expiringCount: expiringProducts.length,
-            },
-            lowStockProducts: actualLowStock,
-            expiringProducts,
-            recentBills,
-            chartData,
-        });
-    } catch (error) {
-        console.error('Dashboard error:', error);
-        return errorResponse('Internal server error', 500);
-    }
+  return successResponse({
+    stats: {
+      todaySales:    Math.round(todaySales   * 100) / 100,
+      todayBills:    bills.length,
+      todayProfit:   Math.round(todayProfit  * 100) / 100,
+      totalProducts: totalProducts || 0,
+      lowStockCount: actualLowStock.length,
+      expiringCount: (expiringProducts || []).length,
+    },
+    lowStockProducts:  actualLowStock,
+    expiringProducts:  expiringProducts  || [],
+    recentBills:       recentBills       || [],
+    chartData,
+  });
 }

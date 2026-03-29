@@ -1,94 +1,64 @@
-// ============================================================
-// Products API
-// GET  /api/products       — List all products (with filtering)
-// POST /api/products       — Create new product
-// ============================================================
+import { adminClient } from '@/lib/supabase/admin';
+import { getUserFromRequest, hasRole, errorResponse, successResponse } from '@/lib/auth';
+import { transformRows, transformRow } from '@/lib/utils';
 
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getUserFromRequest, hasRole } from '@/lib/auth';
-import { errorResponse, successResponse } from '@/lib/utils';
+export async function GET(req: Request) {
+  const user = await getUserFromRequest();
+  if (!user) return errorResponse('Unauthorized', 401);
 
-export async function GET(req: NextRequest) {
-    try {
-        const user = getUserFromRequest(req);
-        if (!user) return errorResponse('Unauthorized', 401);
+  const { searchParams } = new URL(req.url);
+  const search   = searchParams.get('search') || '';
+  const category = searchParams.get('category');
+  const page     = parseInt(searchParams.get('page')  || '1');
+  const limit    = parseInt(searchParams.get('limit') || '50');
 
-        const { searchParams } = new URL(req.url);
-        const category = searchParams.get('category');
-        const search = searchParams.get('search');
-        const lowStock = searchParams.get('lowStock');
-        const page = parseInt(searchParams.get('page') || '1');
-        const limit = parseInt(searchParams.get('limit') || '50');
+  let query = adminClient
+    .from('products')
+    .select('*', { count: 'exact' })
+    .eq('active', true)
+    .order('name')
+    .range((page - 1) * limit, page * limit - 1);
 
-        // Build dynamic where clause
-        const where: Record<string, unknown> = { active: true };
-        if (category) where.category = category;
-        if (search) {
-            where.OR = [
-                { name: { contains: search, mode: 'insensitive' } },
-                { barcode: { contains: search, mode: 'insensitive' } },
-            ];
-        }
-        if (lowStock === 'true') {
-            // Products where quantity <= minStock
-            where.quantity = { lte: prisma.product.fields?.minStock ?? 5 };
-        }
+  if (search)   query = query.ilike('name', '%' + search + '%');
+  if (category) query = query.eq('category', category);
 
-        const [products, total] = await Promise.all([
-            prisma.product.findMany({
-                where,
-                orderBy: { name: 'asc' },
-                skip: (page - 1) * limit,
-                take: limit,
-            }),
-            prisma.product.count({ where }),
-        ]);
+  const { data, count, error } = await query;
+  if (error) return errorResponse(error.message);
 
-        return successResponse({
-            products,
-            pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-        });
-    } catch (error) {
-        console.error('Products GET error:', error);
-        return errorResponse('Internal server error', 500);
-    }
+  return successResponse({
+    products: transformRows(data || []),
+    pagination: { page, limit, total: count, totalPages: Math.ceil((count || 0) / limit) },
+  });
 }
 
-export async function POST(req: NextRequest) {
-    try {
-        const user = getUserFromRequest(req);
-        if (!user || !hasRole(user, ['OWNER', 'MANAGER'])) {
-            return errorResponse('Insufficient permissions', 403);
-        }
+export async function POST(req: Request) {
+  const user = await getUserFromRequest();
+  if (!user || !hasRole(user, 'OWNER', 'MANAGER'))
+    return errorResponse('Insufficient permissions', 403);
 
-        const data = await req.json();
-        const { name, barcode, category, price, costPrice, quantity, unit, minStock, expiryDate } = data;
+  const body = await req.json();
+  if (!body.name || !body.category || body.price === undefined)
+    return errorResponse('Name, category and price are required');
 
-        if (!name || !category || price === undefined) {
-            return errorResponse('Name, category and price are required', 400);
-        }
+  const { data, error } = await adminClient
+    .from('products')
+    .insert({
+      name:        body.name,
+      barcode:     body.barcode     || null,
+      category:    body.category,
+      price:       parseFloat(body.price),
+      cost_price:  parseFloat(body.costPrice  || 0),
+      quantity:    parseInt(body.quantity     || 0),
+      unit:        body.unit        || 'pcs',
+      min_stock:   parseInt(body.minStock     || 5),
+      expiry_date: body.expiryDate  || null,
+    })
+    .select()
+    .single();
 
-        const product = await prisma.product.create({
-            data: {
-                name,
-                barcode: barcode || null,
-                category,
-                price: parseFloat(price),
-                costPrice: parseFloat(costPrice || '0'),
-                quantity: parseInt(quantity || '0'),
-                unit: unit || 'pcs',
-                minStock: parseInt(minStock || '5'),
-                expiryDate: expiryDate ? new Date(expiryDate) : null,
-            },
-        });
-
-        return successResponse(product, 201);
-    } catch (error: unknown) {
-        if ((error as { code?: string }).code === 'P2002') {
-            return errorResponse('A product with this barcode already exists', 409);
-        }
-        console.error('Products POST error:', error);
-        return errorResponse('Internal server error', 500);
-    }
+  if (error) return errorResponse(
+    error.code === '23505' ? 'A product with this barcode already exists' : error.message,
+    error.code === '23505' ? 409 : 400
+  );
+  return successResponse(transformRow(data as Record<string, unknown>), 201);
 }

@@ -1,92 +1,62 @@
-// ============================================================
-// Auth Hook — Manages login state, token storage, API calls
-// ============================================================
-
 'use client';
+import { createClient } from '@/lib/supabase/client';
+import { useEffect, useState, useCallback } from 'react';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-    DEV_AUTH_BYPASS_ENABLED,
-    DEV_AUTH_BYPASS_TOKEN,
-    DEV_AUTH_BYPASS_CLIENT_USER,
-    DEV_AUTH_BYPASS_USER,
-} from '@/lib/auth';
-
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    role: 'OWNER' | 'MANAGER' | 'CASHIER';
+interface UserProfile {
+  id: string;
+  name: string;
+  role: 'OWNER' | 'MANAGER' | 'CASHIER';
+  active: boolean;
 }
 
 export function useAuth() {
-    const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
-    const router = useRouter();
+  const [user, setUser]       = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
 
-    // Load token from localStorage on mount
-    useEffect(() => {
-        const savedToken = localStorage.getItem('pos_token');
-        const savedUser = localStorage.getItem('pos_user');
-        if (savedToken && savedUser) {
-            setToken(savedToken);
-            setUser(JSON.parse(savedUser));
-        } else if (DEV_AUTH_BYPASS_ENABLED) {
-            localStorage.setItem('pos_token', DEV_AUTH_BYPASS_TOKEN);
-            localStorage.setItem('pos_user', JSON.stringify(DEV_AUTH_BYPASS_CLIENT_USER));
-            setToken(DEV_AUTH_BYPASS_TOKEN);
-            setUser(DEV_AUTH_BYPASS_CLIENT_USER);
-        }
-        setLoading(false);
-    }, []);
-
-    const login = useCallback(async (email: string, password: string) => {
-        const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-        });
-
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const res  = await fetch('/api/auth/me');
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Login failed');
-
-        localStorage.setItem('pos_token', data.token);
-        localStorage.setItem('pos_user', JSON.stringify(data.user));
-        setToken(data.token);
-        setUser(data.user);
-        router.push('/dashboard');
-    }, [router]);
-
-    const logout = useCallback(() => {
-        localStorage.removeItem('pos_token');
-        localStorage.removeItem('pos_user');
-        setToken(null);
+        setUser(res.ok ? data : null);
+      }
+      setLoading(false);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
+      if (event === 'SIGNED_IN') {
+        const res  = await fetch('/api/auth/me');
+        const data = await res.json();
+        setUser(res.ok ? data : null);
+      } else if (event === 'SIGNED_OUT') {
         setUser(null);
-        router.push('/');
-    }, [router]);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
-    // Helper: make authenticated API calls
-    const apiFetch = useCallback(async (url: string, options: RequestInit = {}) => {
-        const headers = new Headers(options.headers);
-        if (token ?? DEV_AUTH_BYPASS_ENABLED) {
-            headers.set('Authorization', `Bearer ${token ?? DEV_AUTH_BYPASS_TOKEN}`);
-        }
-        if (!headers.has('Content-Type') && options.method !== 'GET') {
-            headers.set('Content-Type', 'application/json');
-        }
+  const login = useCallback(async (email: string, password: string) => {
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw new Error(error.message);
+    const res  = await fetch('/api/auth/me');
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    setUser(data);
+    return data;
+  }, []);
 
-        const res = await fetch(url, { ...options, headers });
+  const logout = useCallback(async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setUser(null);
+  }, []);
 
-        // Auto-logout on 401
-        if (res.status === 401) {
-            logout();
-            throw new Error('Session expired');
-        }
+  const apiFetch = useCallback(
+    (url: string, options?: RequestInit) =>
+      fetch(url, { ...options, credentials: 'include' }),
+    []
+  );
 
-        return res;
-    }, [token, logout]);
-
-    return { user, token, loading, login, logout, apiFetch };
+  return { user, loading, login, logout, apiFetch };
 }

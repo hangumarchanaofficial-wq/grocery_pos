@@ -1,87 +1,70 @@
-// ============================================================
-// AI Engine — Central orchestrator
-// Combines predictions, insights, and alerts into a unified
-// intelligence layer. Uses statistical methods (no heavy ML).
-// ============================================================
-
-import { prisma } from '@/lib/prisma';
+import { adminClient } from '@/lib/supabase/admin';
 import { generatePredictions } from './predictions';
 import { generateInsights } from './insights';
 import { generateAlerts } from './alerts';
 import type { StockPrediction, SalesInsight, SmartAlert } from '@/types';
 
 export interface AIAnalysis {
-    predictions: StockPrediction[];
-    insights: SalesInsight[];
-    alerts: SmartAlert[];
-    generatedAt: string;
+  predictions: StockPrediction[];
+  insights: SalesInsight[];
+  alerts: SmartAlert[];
+  generatedAt: string;
 }
 
-/**
- * Run the full AI analysis pipeline.
- * This pulls sales data from the last 30 days and computes:
- *   1. Stock depletion predictions
- *   2. Sales insights (top/low sellers, trends)
- *   3. Smart alerts (expiry, reorder, wastage)
- */
 export async function runFullAnalysis(): Promise<AIAnalysis> {
-    // Fetch the last 30 days of sales data with product details
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
+  const [
+    { data: salesData },
+    { data: products },
+    { data: dailyData },
+  ] = await Promise.all([
+    adminClient.rpc('get_product_sales_30days'),
+    adminClient.from('products').select('*').eq('active', true),
+    adminClient.rpc('get_daily_sales_30days'),
+  ]);
 
-    const [salesData, products, allBillItems] = await Promise.all([
-        // Bills grouped by product for sales velocity
-        prisma.billItem.groupBy({
-            by: ['productId'],
-            where: { bill: { createdAt: { gte: thirtyDaysAgo } } },
-            _sum: { quantity: true, total: true },
-            _count: true,
-        }),
+  const salesMap = new Map<string, {
+    totalQtySold: number;
+    totalRevenue: number;
+    transactionCount: number;
+  }>(
+    (salesData || []).map((s: {
+      product_id: string;
+      total_qty_sold: number;
+      total_revenue: number;
+      transaction_count: number;
+    }) => [
+      s.product_id,
+      {
+        totalQtySold: Number(s.total_qty_sold),
+        totalRevenue: s.total_revenue,
+        transactionCount: Number(s.transaction_count),
+      },
+    ])
+  );
 
-        // All active products
-        prisma.product.findMany({ where: { active: true } }),
+  const dailySalesByProduct: Record<string, Record<string, number>> = {};
+  (dailyData || []).forEach((row: {
+    product_id: string;
+    sale_date: string;
+    daily_qty: number;
+  }) => {
+    if (!dailySalesByProduct[row.product_id])
+      dailySalesByProduct[row.product_id] = {};
+    dailySalesByProduct[row.product_id][row.sale_date] = Number(row.daily_qty);
+  });
 
-        // Daily sales for trend detection
-        prisma.billItem.findMany({
-            where: { bill: { createdAt: { gte: thirtyDaysAgo } } },
-            include: {
-                bill: { select: { createdAt: true } },
-                product: { select: { name: true } },
-            },
-        }),
-    ]);
+  const mappedProducts = (products || []).map((p: Record<string, unknown>) => ({
+    id:         p.id as string,
+    name:       p.name as string,
+    price:      p.price as number,
+    quantity:   p.quantity as number,
+    minStock:   p.min_stock as number,
+    expiryDate: p.expiry_date as Date | null,
+  }));
 
-    // Build lookup maps
-    const productMap = new Map(products.map((p) => [p.id, p]));
-    const salesMap = new Map(
-        salesData.map((s) => [
-            s.productId,
-            {
-                totalQtySold: s._sum.quantity || 0,
-                totalRevenue: s._sum.total || 0,
-                transactionCount: s._count,
-            },
-        ])
-    );
+  const predictions = generatePredictions(mappedProducts, salesMap);
+  const insights    = generateInsights(mappedProducts, salesMap, dailySalesByProduct);
+  const alerts      = generateAlerts(mappedProducts, salesMap, predictions);
 
-    // Build daily sales per product (for trend analysis)
-    const dailySalesByProduct: Record<string, Record<string, number>> = {};
-    allBillItems.forEach((item) => {
-        const dateKey = item.bill.createdAt.toISOString().slice(0, 10);
-        const prodId = item.productId;
-        if (!dailySalesByProduct[prodId]) dailySalesByProduct[prodId] = {};
-        dailySalesByProduct[prodId][dateKey] =
-            (dailySalesByProduct[prodId][dateKey] || 0) + item.quantity;
-    });
-
-    // Run all AI modules
-    const predictions = generatePredictions(products, salesMap);
-    const insights = generateInsights(products, salesMap, dailySalesByProduct);
-    const alerts = generateAlerts(products, salesMap, predictions);
-
-    return {
-        predictions,
-        insights,
-        alerts,
-        generatedAt: new Date().toISOString(),
-    };
+  return { predictions, insights, alerts, generatedAt: new Date().toISOString() };
 }

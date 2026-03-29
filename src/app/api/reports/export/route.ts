@@ -1,82 +1,39 @@
-// ============================================================
-// GET /api/reports/export — Export sales report as CSV
-// ============================================================
+import { adminClient } from '@/lib/supabase/admin';
+import { getUserFromRequest, hasRole, errorResponse } from '@/lib/auth';
 
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getUserFromRequest, hasRole } from '@/lib/auth';
-import { errorResponse } from '@/lib/utils';
+export async function GET(req: Request) {
+  const user = await getUserFromRequest();
+  if (!user || !hasRole(user, 'OWNER', 'MANAGER'))
+    return errorResponse('Insufficient permissions', 403);
 
-export async function GET(req: NextRequest) {
-    try {
-        const user = getUserFromRequest(req);
-        if (!user || !hasRole(user, ['OWNER', 'MANAGER'])) {
-            return errorResponse('Insufficient permissions', 403);
-        }
+  const { searchParams } = new URL(req.url);
+  const from = searchParams.get('from') ? new Date(searchParams.get('from')!) : new Date(Date.now() - 30 * 86400000);
+  const to   = searchParams.get('to')   ? new Date(searchParams.get('to')!)   : new Date();
+  to.setHours(23, 59, 59, 999);
 
-        const { searchParams } = new URL(req.url);
-        const fromDate = searchParams.get('from');
-        const toDate = searchParams.get('to');
+  const { data: bills } = await adminClient
+    .from('bills')
+    .select('bill_number, created_at, total, subtotal, tax, discount, payment_method, bill_items(quantity, products(name)), customers(name), users(name)')
+    .gte('created_at', from.toISOString())
+    .lte('created_at', to.toISOString())
+    .order('created_at', { ascending: true });
 
-        const from = fromDate ? new Date(fromDate) : new Date(Date.now() - 30 * 86400000);
-        const to = toDate ? new Date(toDate) : new Date();
-        to.setHours(23, 59, 59, 999);
+  const headers = 'Bill Number,Date,Customer,Items,Subtotal,Tax,Discount,Total,Payment Method,Cashier\n';
+  const rows = (bills || []).map((b: Record<string, unknown>) =>
+    [
+      b.bill_number,
+      String(b.created_at).slice(0, 19).replace('T', ' '),
+      (b.customers as { name?: string } | null)?.name || 'Walk-in',
+      (b.bill_items as { quantity: number; products: { name: string } }[])?.map((i) => i.products?.name + ' x' + i.quantity).join('; '),
+      b.subtotal, b.tax, b.discount, b.total, b.payment_method,
+      (b.users as { name?: string } | null)?.name,
+    ].map((c) => '"' + String(c ?? '').replace(/"/g, '""') + '"').join(',')
+  );
 
-        const bills = await prisma.bill.findMany({
-            where: { createdAt: { gte: from, lte: to } },
-            include: {
-                items: {
-                    include: { product: { select: { name: true } } },
-                },
-                customer: { select: { name: true, phone: true } },
-                user: { select: { name: true } },
-            },
-            orderBy: { createdAt: 'asc' },
-        });
-
-        // Build CSV
-        const headers = [
-            'Bill Number',
-            'Date',
-            'Customer',
-            'Items',
-            'Subtotal',
-            'Tax',
-            'Discount',
-            'Total',
-            'Payment Method',
-            'Cashier',
-        ];
-
-        const rows = bills.map((bill) => [
-            bill.billNumber,
-            bill.createdAt.toISOString().slice(0, 19).replace('T', ' '),
-            bill.customer?.name || 'Walk-in',
-            bill.items.map((i) => `${i.product.name} x${i.quantity}`).join('; '),
-            bill.subtotal.toFixed(2),
-            bill.tax.toFixed(2),
-            bill.discount.toFixed(2),
-            bill.total.toFixed(2),
-            bill.paymentMethod,
-            bill.user.name,
-        ]);
-
-        const csv = [
-            headers.join(','),
-            ...rows.map((row) =>
-                row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')
-            ),
-        ].join('\n');
-
-        return new Response(csv, {
-            status: 200,
-            headers: {
-                'Content-Type': 'text/csv',
-                'Content-Disposition': `attachment; filename="sales-report-${from.toISOString().slice(0, 10)}-to-${to.toISOString().slice(0, 10)}.csv"`,
-            },
-        });
-    } catch (error) {
-        console.error('CSV export error:', error);
-        return errorResponse('Internal server error', 500);
-    }
+  return new Response(headers + rows.join('\n'), {
+    headers: {
+      'Content-Type': 'text/csv',
+      'Content-Disposition': 'attachment; filename="sales-' + from.toISOString().slice(0, 10) + '-' + to.toISOString().slice(0, 10) + '.csv"',
+    },
+  });
 }

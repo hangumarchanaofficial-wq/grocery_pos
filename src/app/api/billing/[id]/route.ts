@@ -1,43 +1,20 @@
-// ============================================================
-// GET /api/billing/:id — Get single bill with full details
-// ============================================================
+import { adminClient } from '@/lib/supabase/admin';
+import { getUserFromRequest, errorResponse, successResponse } from '@/lib/auth';
+import { transformRow } from '@/lib/utils';
 
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getUserFromRequest } from '@/lib/auth';
-import { errorResponse, successResponse } from '@/lib/utils';
+interface RouteParams { params: Promise<{ id: string }> }
 
-interface RouteParams {
-    params: Promise<{ id: string }>;
-}
+export async function GET(_req: Request, { params }: RouteParams) {
+  const user = await getUserFromRequest();
+  if (!user) return errorResponse('Unauthorized', 401);
+  const { id } = await params;
 
-export async function GET(req: NextRequest, { params }: RouteParams) {
-    try {
-        const user = getUserFromRequest(req);
-        if (!user) return errorResponse('Unauthorized', 401);
+  const { data, error } = await adminClient
+    .from('bills')
+    .select('*, bill_items(*, products(name, barcode, category, unit)), customers(*), users(name, email)')
+    .eq('id', id)
+    .single();
 
-        const { id } = await params;
-
-        const bill = await prisma.bill.findUnique({
-            where: { id },
-            include: {
-                items: {
-                    include: {
-                        product: {
-                            select: { name: true, barcode: true, category: true, unit: true },
-                        },
-                    },
-                },
-                customer: true,
-                user: { select: { name: true, email: true } },
-            },
-        });
-
-        if (!bill) return errorResponse('Bill not found', 404);
-
-        return successResponse(bill);
-    } catch (error) {
-        console.error('Bill GET error:', error);
-        return errorResponse('Internal server error', 500);
-    }
+  if (error || !data) return errorResponse('Bill not found', 404);
+  return successResponse(transformRow(data as Record<string, unknown>));
 }
