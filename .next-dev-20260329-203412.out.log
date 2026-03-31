@@ -1,0 +1,19 @@
+
+> grocery-pos@1.0.0 dev
+> next dev --port 3000
+
+▲ Next.js 16.2.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.8.100:3000
+- Environments: .env.local, .env
+✓ Ready in 596ms
+Creating turbopack project { dir: 'E:\\grocery-pos', testMode: true }
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 200 in 879ms (next.js: 445ms, application-code: 435ms)
+ GET / 200 in 57ms (next.js: 5ms, application-code: 52ms)
+ GET / 200 in 57ms (next.js: 6ms, application-code: 50ms)
+  Reload env: .env.local
+✓ Compiled in 350ms
+ GET / 200 in 491ms (next.js: 372ms, application-code: 120ms)

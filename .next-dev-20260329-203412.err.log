@@ -1,0 +1,849 @@
+[browser] Uncaught Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at <unknown> (https://supabase.com/dashboard/project/_/settings/api)
+    at createClient (src/lib/supabase/client.ts:4:22)
+    at useAuth.useEffect (src/hooks/useAuth.ts:17:34)
+  2 |
+  3 | export const createClient = () =>
+> 4 |   createBrowserClient(
+    |                      ^
+  5 |     process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  6 |     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  7 |   );
+[browser] Uncaught Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at <unknown> (https://supabase.com/dashboard/project/_/settings/api)
+    at createClient (src/lib/supabase/client.ts:4:22)
+    at useAuth.useEffect (src/hooks/useAuth.ts:17:34)
+  2 |
+  3 | export const createClient = () =>
+> 4 |   createBrowserClient(
+    |                      ^
+  5 |     process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  6 |     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  7 |   );
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+Persisting failed: Unable to open static sorted file referenced from 00001265.meta
+
+Caused by:
+    0: Unable to open static sorted file 00001264.sst
+    1: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001264.sst
+    2: The system cannot find the file specified. (os error 2)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+⨯ Error: ENOENT: no such file or directory, open 'E:\grocery-pos\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'E:\\grocery-pos\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+
+thread 'tokio-runtime-worker' (32144) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+-----
+[1m[31mFATAL[39m[0m: An unexpected Turbopack error occurred. A panic log has been written to C:\Users\hangu\AppData\Local\Temp\next-panic-2313f8d592d5c07fdd91c233081bca2a.log.
+
+To help make Turbopack better, report this error by clicking here: https://bugs.nextjs.org/search?category=turbopack-error-report&title=Turbopack%20Error%3A%20Failed%20to%20lookup%20task%20ids%3A%20Looking%20up%20task%20id%20for%20CachedTaskType%20%7B%20native_fn%3A%20NativeFunction%20%7B%20name%3A%20%22get_written_endpoint_with_issues_operation%22%2C%20global_name%3A%20%22next_napi_bindings%3A%3Anext_api%3A%3Aendpoint%3A%3Aget_written_endpoint_with_issues_operation%22%2C%20..%20%7D%2C%20this%3A%20None%2C%20arg%3A%20%28OperationVc%20%7B%20node%3A%20RawVc%3A%3ATaskOutput%28415%29%20%7D%2C%29%20%7D%20from%20database%20failed&body=Turbopack%20version%3A%20%603e37bb42%60%0ANext.js%20version%3A%20%600.0.0%60%0A%0AError%20message%3A%0A%60%60%60%0AFailed%20to%20lookup%20task%20ids%3A%20Looking%20up%20task%20id%20for%20CachedTaskType%20%7B%20native_fn%3A%20NativeFunction%20%7B%20name%3A%20%22get_written_endpoint_with_issues_operation%22%2C%20global_name%3A%20%22next_napi_bindings%3A%3Anext_api%3A%3Aendpoint%3A%3Aget_written_endpoint_with_issues_operation%22%2C%20..%20%7D%2C%20this%3A%20None%2C%20arg%3A%20%28OperationVc%20%7B%20node%3A%20RawVc%3A%3ATaskOutput%28415%29%20%7D%2C%29%20%7D%20from%20database%20failed%0A%0ADebug%20info%3A%0A-%20Failed%20to%20lookup%20task%20ids%3A%20Looking%20up%20task%20id%20for%20CachedTaskType%20%7B%20native_fn%3A%20NativeFunction%20%7B%20name%3A%20%22get_written_endpoint_with_issues_operation%22%2C%20global_name%3A%20%22next_napi_bindings%3A%3Anext_api%3A%3Aendpoint%3A%3Aget_written_endpoint_with_issues_operation%22%2C%20..%20%7D%2C%20this%3A%20None%2C%20arg%3A%20%28OperationVc%20%7B%20node%3A%20RawVc%3A%3ATaskOutput%28415%29%20%7D%2C%29%20%7D%20from%20database%20failed%0A%20%20%0A%20%20Caused%20by%3A%0A%20%20%20%20%20%200%3A%20Unable%20to%20open%20static%20sorted%20file%20referenced%20from%2000000097.meta%0A%20%20%20%20%20%201%3A%20Unable%20to%20open%20static%20sorted%20file%2000000093.sst%0A%20%20%20%20%20%202%3A%20Failed%20to%20open%20SST%20file%20E%3A%5Cgrocery-pos%5C.next%5Cdev%5Ccache%2Fturbopack%5C3e37bb42%5C00000093.sst%0A%20%20%20%20%20%203%3A%20The%20system%20cannot%20find%20the%20file%20specified.%20%28os%20error%202%29%0A%60%60%60&labels=Turbopack,Turbopack%20Panic%20Backtrace
+-----
+
+⨯ Error [TurbopackInternalError]: Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Debug info:
+- Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+  
+  Caused by:
+      0: Unable to open static sorted file referenced from 00000097.meta
+      1: Unable to open static sorted file 00000093.sst
+      2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+      3: The system cannot find the file specified. (os error 2)
+    at <unknown> (TurbopackInternalError: Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed) {
+  location: 'turbopack\\crates\\turbo-tasks-backend\\src\\backend\\operation\\mod.rs:618:14'
+}
+
+thread 'tokio-runtime-worker' (32144) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+Error: ENOENT: no such file or directory, open 'E:\grocery-pos\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'E:\\grocery-pos\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+
+thread 'tokio-runtime-worker' (32144) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+⨯ Error [TurbopackInternalError]: Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Debug info:
+- Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+  
+  Caused by:
+      0: Unable to open static sorted file referenced from 00000097.meta
+      1: Unable to open static sorted file 00000093.sst
+      2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+      3: The system cannot find the file specified. (os error 2)
+    at <unknown> (TurbopackInternalError: Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed) {
+  location: 'turbopack\\crates\\turbo-tasks-backend\\src\\backend\\operation\\mod.rs:618:14'
+}
+
+thread 'tokio-runtime-worker' (32144) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+Error [TurbopackInternalError]: Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Debug info:
+- Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+  
+  Caused by:
+      0: Unable to open static sorted file referenced from 00000097.meta
+      1: Unable to open static sorted file 00000093.sst
+      2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+      3: The system cannot find the file specified. (os error 2)
+    at <unknown> (TurbopackInternalError: Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed) {
+  location: 'turbopack\\crates\\turbo-tasks-backend\\src\\backend\\operation\\mod.rs:618:14'
+}
+⨯ Error: ENOENT: no such file or directory, open 'E:\grocery-pos\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'E:\\grocery-pos\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+
+thread 'tokio-runtime-worker' (32144) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+⨯ Error [TurbopackInternalError]: Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Debug info:
+- Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+  
+  Caused by:
+      0: Unable to open static sorted file referenced from 00000097.meta
+      1: Unable to open static sorted file 00000093.sst
+      2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+      3: The system cannot find the file specified. (os error 2)
+    at <unknown> (TurbopackInternalError: Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed) {
+  location: 'turbopack\\crates\\turbo-tasks-backend\\src\\backend\\operation\\mod.rs:618:14'
+}
+
+thread 'tokio-runtime-worker' (32144) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+Error: ENOENT: no such file or directory, open 'E:\grocery-pos\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'E:\\grocery-pos\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+
+thread 'tokio-runtime-worker' (29820) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+
+-----
+[1m[31mFATAL[39m[0m: An unexpected Turbopack error occurred. A panic log has been written to C:\Users\hangu\AppData\Local\Temp\next-panic-2313f8d592d5c07fdd91c233081bca2a.log.
+
+To help make Turbopack better, report this error by clicking here: https://bugs.nextjs.org/search?category=turbopack-error-report&title=Turbopack%20Error%3A%20Failed%20to%20lookup%20task%20ids%3A%20Looking%20up%20task%20id%20for%20CachedTaskType%20%7B%20native_fn%3A%20NativeFunction%20%7B%20name%3A%20%22get_written_endpoint_with_issues_operation%22%2C%20global_name%3A%20%22next_napi_bindings%3A%3Anext_api%3A%3Aendpoint%3A%3Aget_written_endpoint_with_issues_operation%22%2C%20..%20%7D%2C%20this%3A%20None%2C%20arg%3A%20%28OperationVc%20%7B%20node%3A%20RawVc%3A%3ATaskOutput%28415%29%20%7D%2C%29%20%7D%20from%20database%20failed&body=Turbopack%20version%3A%20%603e37bb42%60%0ANext.js%20version%3A%20%600.0.0%60%0A%0AError%20message%3A%0A%60%60%60%0AFailed%20to%20lookup%20task%20ids%3A%20Looking%20up%20task%20id%20for%20CachedTaskType%20%7B%20native_fn%3A%20NativeFunction%20%7B%20name%3A%20%22get_written_endpoint_with_issues_operation%22%2C%20global_name%3A%20%22next_napi_bindings%3A%3Anext_api%3A%3Aendpoint%3A%3Aget_written_endpoint_with_issues_operation%22%2C%20..%20%7D%2C%20this%3A%20None%2C%20arg%3A%20%28OperationVc%20%7B%20node%3A%20RawVc%3A%3ATaskOutput%28415%29%20%7D%2C%29%20%7D%20from%20database%20failed%0A%0ADebug%20info%3A%0A-%20Failed%20to%20lookup%20task%20ids%3A%20Looking%20up%20task%20id%20for%20CachedTaskType%20%7B%20native_fn%3A%20NativeFunction%20%7B%20name%3A%20%22get_written_endpoint_with_issues_operation%22%2C%20global_name%3A%20%22next_napi_bindings%3A%3Anext_api%3A%3Aendpoint%3A%3Aget_written_endpoint_with_issues_operation%22%2C%20..%20%7D%2C%20this%3A%20None%2C%20arg%3A%20%28OperationVc%20%7B%20node%3A%20RawVc%3A%3ATaskOutput%28415%29%20%7D%2C%29%20%7D%20from%20database%20failed%0A%20%20%0A%20%20Caused%20by%3A%0A%20%20%20%20%20%200%3A%20Unable%20to%20open%20static%20sorted%20file%20referenced%20from%2000000097.meta%0A%20%20%20%20%20%201%3A%20Unable%20to%20open%20static%20sorted%20file%2000000093.sst%0A%20%20%20%20%20%202%3A%20Failed%20to%20open%20SST%20file%20E%3A%5Cgrocery-pos%5C.next%5Cdev%5Ccache%2Fturbopack%5C3e37bb42%5C00000093.sst%0A%20%20%20%20%20%203%3A%20The%20system%20cannot%20find%20the%20file%20specified.%20%28os%20error%202%29%0A%60%60%60&labels=Turbopack,Turbopack%20Panic%20Backtrace
+-----
+
+⨯ Error [TurbopackInternalError]: Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Debug info:
+- Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+  
+  Caused by:
+      0: Unable to open static sorted file referenced from 00000097.meta
+      1: Unable to open static sorted file 00000093.sst
+      2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+      3: The system cannot find the file specified. (os error 2)
+    at <unknown> (TurbopackInternalError: Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed) {
+  location: 'turbopack\\crates\\turbo-tasks-backend\\src\\backend\\operation\\mod.rs:618:14'
+}
+
+thread 'tokio-runtime-worker' (32144) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+Error [TurbopackInternalError]: Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+
+Debug info:
+- Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed
+  
+  Caused by:
+      0: Unable to open static sorted file referenced from 00000097.meta
+      1: Unable to open static sorted file 00000093.sst
+      2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+      3: The system cannot find the file specified. (os error 2)
+    at <unknown> (TurbopackInternalError: Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_written_endpoint_with_issues_operation", global_name: "next_napi_bindings::next_api::endpoint::get_written_endpoint_with_issues_operation", .. }, this: None, arg: (OperationVc { node: RawVc::TaskOutput(415) },) } from database failed) {
+  location: 'turbopack\\crates\\turbo-tasks-backend\\src\\backend\\operation\\mod.rs:618:14'
+}
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (36880) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 4 tasks
+
+Caused by:
+    0: Looking up typed data for 4 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001220.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001220.sst
+    4: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (36880) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 2 tasks
+
+Caused by:
+    0: Looking up typed data for 2 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001220.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001220.sst
+    4: The system cannot find the file specified. (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (29820) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: false, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\dev\\hot-reloader-turbopack.js", line: Some(1189), column: Some(59), method_name: Some("Object.getCompilationErrors") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (22768) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: false, is_ignored: None, original_file: None, file: "https://nextjs.org/docs/messages/module-not-found", line: None, column: None, method_name: Some("<unknown>") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000256.meta
+    1: Unable to open static sorted file 00000253.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000253.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (19824) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: false, is_ignored: None, original_file: None, file: "https://nextjs.org/docs/messages/module-not-found", line: None, column: None, method_name: Some("<unknown>") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000256.meta
+    1: Unable to open static sorted file 00000253.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000253.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (9092) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "https://nextjs.org/docs/messages/module-not-found", line: None, column: None, method_name: Some("<unknown>") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000469.meta
+    1: Unable to open static sorted file 00000465.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000465.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (16160) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: false, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\lib\\dev-bundler-service.js", line: Some(44), column: Some(55), method_name: Some("DevBundlerService.getCompilationError") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (36384) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: false, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js", line: Some(719), column: Some(42), method_name: Some("DevServer.getCompilationError") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (32144) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: false, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js", line: Some(689), column: Some(43), method_name: Some("DevServer.findPageComponents") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (19704) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: false, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\base-server.js", line: Some(1745), column: Some(26), method_name: Some("async DevServer.renderErrorToResponseImpl") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000097.meta
+    1: Unable to open static sorted file 00000093.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000093.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (37144) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: false, is_ignored: None, original_file: None, file: "./src/lib/auth.ts", line: Some(7), column: Some(1), method_name: Some("<unknown> (Error:") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000806.meta
+    1: Unable to open static sorted file 00000804.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000804.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (36312) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: false, is_ignored: None, original_file: None, file: "Error: ./src/lib/auth.ts", line: Some(7), column: Some(1), method_name: Some("<unknown>") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000806.meta
+    1: Unable to open static sorted file 00000804.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000804.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (36880) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "https://nextjs.org/docs/messages/module-not-found", line: None, column: None, method_name: Some("<unknown>") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000469.meta
+    1: Unable to open static sorted file 00000465.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000465.sst
+    3: The system cannot find the file specified. (os error 2)
+[browser] Uncaught Error: ./src/lib/auth.ts:7:1
+Module not found: Can't resolve 'bcryptjs'
+   5 |
+   6 | import jwt, { type SignOptions } from 'jsonwebtoken';
+>  7 | import bcrypt from 'bcryptjs';
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import { NextRequest } from 'next/server';
+   9 | import { Role } from '@prisma/client';
+  10 |
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/lib/auth.ts [Client Component Browser]
+    ./src/hooks/useAuth.ts [Client Component Browser]
+    ./src/app/page.tsx [Client Component Browser]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/lib/auth.ts [Client Component SSR]
+    ./src/hooks/useAuth.ts [Client Component SSR]
+    ./src/app/page.tsx [Client Component SSR]
+    ./src/app/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (Error: ./src/lib/auth.ts:7:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (Error: (./src/lib/auth.ts:7:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at Object.getCompilationErrors (file://E:\grocery-pos\node_modules\next\dist\server\dev\hot-reloader-turbopack.js:1189:59)
+    at DevBundlerService.getCompilationError (file://E:\grocery-pos\node_modules\next\dist\server\lib\dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file://E:\grocery-pos\node_modules\next\dist\server\dev\next-dev-server.js:719:42)
+    at DevServer.findPageComponents (file://E:\grocery-pos\node_modules\next\dist\server\dev\next-dev-server.js:689:43)
+    at async DevServer.renderErrorToResponseImpl (file://E:\grocery-pos\node_modules\next\dist\server\base-server.js:1745:26)
+
+thread 'tokio-runtime-worker' (36156) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_source_map_rope", global_name: "next_napi_bindings::next_api::project::get_source_map_rope", .. }, this: None, arg: (Vc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), "./src/lib/auth.ts") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00001079.meta
+    1: Unable to open static sorted file 00001075.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001075.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (29820) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "get_source_map_rope", global_name: "next_napi_bindings::next_api::project::get_source_map_rope", .. }, this: None, arg: (Vc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), "Error: ./src/lib/auth.ts") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000806.meta
+    1: Unable to open static sorted file 00000804.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000804.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (9092) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js", line: Some(689), column: Some(43), method_name: Some("DevServer.findPageComponents") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000108.meta
+    1: Unable to open static sorted file 00000104.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000104.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (16160) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js", line: Some(719), column: Some(42), method_name: Some("DevServer.getCompilationError") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000108.meta
+    1: Unable to open static sorted file 00000104.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000104.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (19824) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\dev\\hot-reloader-turbopack.js", line: Some(1189), column: Some(59), method_name: Some("Object.getCompilationErrors") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000108.meta
+    1: Unable to open static sorted file 00000104.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000104.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (36384) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\lib\\dev-bundler-service.js", line: Some(44), column: Some(55), method_name: Some("DevBundlerService.getCompilationError") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000108.meta
+    1: Unable to open static sorted file 00000104.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000104.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (22768) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\base-server.js", line: Some(1745), column: Some(26), method_name: Some("async DevServer.renderErrorToResponseImpl") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000108.meta
+    1: Unable to open static sorted file 00000104.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000104.sst
+    3: The system cannot find the file specified. (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (19824) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 4 tasks
+
+Caused by:
+    0: Looking up typed data for 4 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001254.meta
+    2: Unable to open static sorted file 00001248.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001248.sst
+    4: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (19824) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 3 tasks
+
+Caused by:
+    0: Looking up typed data for 3 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001240.meta
+    2: Unable to open static sorted file 00001231.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001231.sst
+    4: The system cannot find the file specified. (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (32144) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 8 tasks
+
+Caused by:
+    0: Looking up typed data for 8 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001222.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001222.sst
+    4: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (32144) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 3 tasks
+
+Caused by:
+    0: Looking up typed data for 3 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001220.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001220.sst
+    4: The system cannot find the file specified. (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (29820) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 4 tasks
+
+Caused by:
+    0: Looking up typed data for 4 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001220.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001220.sst
+    4: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (29820) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 3 tasks
+
+Caused by:
+    0: Looking up typed data for 3 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001220.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001220.sst
+    4: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (29820) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 6 tasks
+
+Caused by:
+    0: Looking up typed data for 6 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001220.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001220.sst
+    4: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (29820) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 3 tasks
+
+Caused by:
+    0: Looking up typed data for 3 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001220.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001220.sst
+    4: The system cannot find the file specified. (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (22768) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 6 tasks
+
+Caused by:
+    0: Looking up typed data for 6 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001220.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001220.sst
+    4: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (22768) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 3 tasks
+
+Caused by:
+    0: Looking up typed data for 3 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001220.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001220.sst
+    4: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (36880) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 6 tasks
+
+Caused by:
+    0: Looking up typed data for 6 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001222.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001222.sst
+    4: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (36880) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 3 tasks
+
+Caused by:
+    0: Looking up typed data for 3 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001220.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001220.sst
+    4: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (22768) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 4 tasks
+
+Caused by:
+    0: Looking up typed data for 4 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001220.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001220.sst
+    4: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (22768) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 2 tasks
+
+Caused by:
+    0: Looking up typed data for 2 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001220.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001220.sst
+    4: The system cannot find the file specified. (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (22768) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 8 tasks
+
+Caused by:
+    0: Looking up typed data for 8 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001222.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001222.sst
+    4: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (22768) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:224:17:
+Failed to restore task data (corrupted database or bug): Data for batch of 3 tasks
+
+Caused by:
+    0: Looking up typed data for 3 tasks from database failed
+    1: Unable to open static sorted file referenced from 00001223.meta
+    2: Unable to open static sorted file 00001222.sst
+    3: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00001222.sst
+    4: The system cannot find the file specified. (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+[browser] Uncaught Error: ./src/lib/auth.ts:7:1
+Module not found: Can't resolve 'bcryptjs'
+   5 |
+   6 | import jwt, { type SignOptions } from 'jsonwebtoken';
+>  7 | import bcrypt from 'bcryptjs';
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import { NextRequest } from 'next/server';
+   9 | import { Role } from '@prisma/client';
+  10 |
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/lib/auth.ts [Client Component Browser]
+    ./src/hooks/useAuth.ts [Client Component Browser]
+    ./src/app/page.tsx [Client Component Browser]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/lib/auth.ts [Client Component SSR]
+    ./src/hooks/useAuth.ts [Client Component SSR]
+    ./src/app/page.tsx [Client Component SSR]
+    ./src/app/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (Error: ./src/lib/auth.ts:7:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (Error: (./src/lib/auth.ts:7:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at Object.getCompilationErrors (file://E:\grocery-pos\node_modules\next\dist\server\dev\hot-reloader-turbopack.js:1189:59)
+    at DevBundlerService.getCompilationError (file://E:\grocery-pos\node_modules\next\dist\server\lib\dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file://E:\grocery-pos\node_modules\next\dist\server\dev\next-dev-server.js:719:42)
+    at DevServer.findPageComponents (file://E:\grocery-pos\node_modules\next\dist\server\dev\next-dev-server.js:689:43)
+    at async DevServer.renderErrorToResponseImpl (file://E:\grocery-pos\node_modules\next\dist\server\base-server.js:1745:26)
+
+thread 'tokio-runtime-worker' (36384) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\lib\\dev-bundler-service.js", line: Some(44), column: Some(55), method_name: Some("DevBundlerService.getCompilationError") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000108.meta
+    1: Unable to open static sorted file 00000104.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000104.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (9092) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js", line: Some(689), column: Some(43), method_name: Some("DevServer.findPageComponents") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000108.meta
+    1: Unable to open static sorted file 00000104.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000104.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (22768) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "https://nextjs.org/docs/messages/module-not-found", line: None, column: None, method_name: Some("<unknown>") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000469.meta
+    1: Unable to open static sorted file 00000465.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000465.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (16160) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js", line: Some(719), column: Some(42), method_name: Some("DevServer.getCompilationError") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000108.meta
+    1: Unable to open static sorted file 00000104.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000104.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (19704) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\base-server.js", line: Some(1745), column: Some(26), method_name: Some("async DevServer.renderErrorToResponseImpl") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000108.meta
+    1: Unable to open static sorted file 00000104.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000104.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (36312) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "file://E:\\grocery-pos\\node_modules\\next\\dist\\server\\dev\\hot-reloader-turbopack.js", line: Some(1189), column: Some(59), method_name: Some("Object.getCompilationErrors") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000108.meta
+    1: Unable to open static sorted file 00000104.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000104.sst
+    3: The system cannot find the file specified. (os error 2)
+
+thread 'tokio-runtime-worker' (36156) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:618:14:
+Failed to lookup task ids: Looking up task id for CachedTaskType { native_fn: NativeFunction { name: "project_trace_source_operation", global_name: "next_napi_bindings::next_api::project::project_trace_source_operation", .. }, this: None, arg: (ResolvedVc(RawVc::TaskCell(1, "next_api::project::ProjectContainer#0")), StackFrame { is_server: true, is_ignored: None, original_file: None, file: "https://nextjs.org/docs/messages/module-not-found", line: None, column: None, method_name: Some("<unknown>") }, "file:///E:/grocery-pos") } from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000469.meta
+    1: Unable to open static sorted file 00000465.sst
+    2: Failed to open SST file E:\grocery-pos\.next\dev\cache/turbopack\3e37bb42\00000465.sst
+    3: The system cannot find the file specified. (os error 2)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)

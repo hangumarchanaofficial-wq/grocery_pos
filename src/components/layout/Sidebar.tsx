@@ -31,24 +31,7 @@ export default function Sidebar() {
     <aside className="glass-strong flex h-screen w-[272px] flex-col border-r border-white/[0.04] lg:sticky lg:top-0">
       {/* ── Brand ── */}
       <div className="border-b border-white/[0.04] px-5 py-5">
-        <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-emerald-500 text-slate-950 shadow-[0_8px_30px_rgba(34,197,94,0.25)]">
-            <ShoppingCart size={18} />
-          </div>
-          <div>
-            <h1 className="text-[15px] font-semibold tracking-tight text-slate-50">GroceryPOS</h1>
-            <p className="label-caps mt-0.5 text-slate-600">Retail Command</p>
-          </div>
-        </div>
-
-        {/* Status card */}
-        <div className="rounded-[16px] border border-emerald-400/[0.08] bg-emerald-500/[0.04] p-3.5">
-          <div className="flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
-            <span className="label-caps text-emerald-400">Store Online</span>
-          </div>
-          <p className="mt-2 text-xs text-slate-400">Register and AI monitoring active.</p>
-        </div>
+        <h1 className="text-[15px] font-semibold tracking-tight text-slate-50">GroceryPOS</h1>
       </div>
 
       {/* ── Nav ── */}
