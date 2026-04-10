@@ -1,5 +1,5 @@
 import { createClient } from './supabase/server';
-import { adminClient } from './supabase/admin';
+import { getAdminClient } from './supabase/admin';
 
 export interface AuthUser {
   id: string;
@@ -14,7 +14,10 @@ export async function getUserFromRequest(): Promise<AuthUser | null> {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) return null;
 
-    const { data: profile } = await adminClient
+    const admin = getAdminClient();
+    if (!admin) return null;
+
+    const { data: profile } = await admin
       .from('users')
       .select('id, name, role, active')
       .eq('id', user.id)
