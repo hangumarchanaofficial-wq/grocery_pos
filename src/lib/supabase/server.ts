@@ -9,10 +9,15 @@ export const createClient = async () => {
     {
       cookies: {
         getAll: () => cookieStore.getAll(),
-        setAll: (list) =>
-          list.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          ),
+        setAll: (list) => {
+          try {
+            list.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // GET Route Handlers / some hosts disallow cookie mutation; session still works via client.
+          }
+        },
       },
     }
   );
