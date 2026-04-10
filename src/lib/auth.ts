@@ -1,4 +1,4 @@
-import { createClient } from './supabase/server';
+﻿import { createClient } from './supabase/server';
 import { getAdminClient } from './supabase/admin';
 
 export interface AuthUser {
@@ -30,8 +30,10 @@ export async function getUserFromRequest(): Promise<AuthUser | null> {
   }
 }
 
-export function hasRole(user: AuthUser | null, ...roles: string[]): boolean {
-  return !!user && roles.includes(user.role);
+export function hasRole(user: AuthUser | null, roles: string | string[]): boolean {
+  if (!user) return false;
+  const arr = Array.isArray(roles) ? roles : [roles];
+  return arr.includes(user.role);
 }
 
 export function errorResponse(message: string, status = 400): Response {
