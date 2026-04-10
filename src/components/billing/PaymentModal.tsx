@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // Payment Modal - Choose payment method & complete sale
 // ============================================================
 
@@ -9,6 +9,7 @@ import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useCartStore } from '@/store/cartStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import { formatCurrency } from '@/lib/utils';
 import { Banknote, CreditCard, QrCode, CheckCircle } from 'lucide-react';
 
@@ -32,10 +33,13 @@ export default function PaymentModal({ open, onClose, onSubmit }: PaymentModalPr
     const [success, setSuccess] = useState(false);
 
     const { getSubtotal, items } = useCartStore();
+    const { settings } = useSettingsStore();
+
     const discountNum = parseFloat(discount) || 0;
     const subtotal = getSubtotal();
     const adjustedSubtotal = subtotal - discountNum;
-    const tax = adjustedSubtotal * 0.05;
+    const taxRate = settings.taxRate / 100;
+    const tax = adjustedSubtotal * taxRate;
     const total = adjustedSubtotal + tax;
     const paid = parseFloat(paidAmount) || total;
     const change = Math.max(0, paid - total);
@@ -126,10 +130,12 @@ export default function PaymentModal({ open, onClose, onSubmit }: PaymentModalPr
                             <span>-{formatCurrency(discountNum)}</span>
                         </div>
                     )}
-                    <div className="mt-2 flex justify-between text-sm text-slate-400">
-                        <span>Tax (5%)</span>
-                        <span>{formatCurrency(tax)}</span>
-                    </div>
+                    {settings.taxRate > 0 && (
+                        <div className="mt-2 flex justify-between text-sm text-slate-400">
+                            <span>Tax ({settings.taxRate}%)</span>
+                            <span>{formatCurrency(tax)}</span>
+                        </div>
+                    )}
                     <div className="mt-3 flex justify-between border-t border-white/8 pt-3 text-lg font-semibold text-slate-100">
                         <span>Total</span>
                         <span className="text-brand-300">{formatCurrency(total)}</span>

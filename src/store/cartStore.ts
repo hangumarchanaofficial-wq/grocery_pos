@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // Cart Store (Zustand) — Manages the billing cart state
 // Separated from components for clean state management.
 // ============================================================
@@ -15,6 +15,7 @@ interface CartStore {
     addItem: (product: {
         id: string;
         name: string;
+        productCode?: string;
         price: number;
         costPrice: number;
         quantity: number; // available stock
@@ -59,6 +60,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
                     {
                         productId: product.id,
                         name: product.name,
+                        productCode: product.productCode,
                         price: product.price,
                         costPrice: product.costPrice,
                         quantity: 1,

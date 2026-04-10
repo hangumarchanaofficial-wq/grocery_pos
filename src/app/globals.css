@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 /* ============================================================
    DARK-ONLY PREMIUM THEME
@@ -151,13 +151,20 @@ select:focus {
 .animate-pulse-dot {
   animation: pulse-dot 2s ease-in-out infinite;
 }
+
 /* ── Sinhala Font Support ── */
 .font-sinhala {
   font-family: var(--font-sinhala), 'Noto Sans Sinhala', 'Iskoola Pota', sans-serif;
 }
 
-/* ── Receipt Print Isolation ── */
+/* ── Language transition ── */
+.lang-transition {
+  transition: all 0.2s ease;
+}
+
+/* ── Print — Receipt only, single canonical block ── */
 @media print {
+  @page { margin: 0; size: 80mm auto; }
   body * { visibility: hidden !important; }
   .print-receipt,
   .print-receipt * { visibility: visible !important; }
@@ -166,16 +173,10 @@ select:focus {
     top: 0;
     left: 0;
     width: 80mm;
-    background: white;
-    color: black;
+    background: white !important;
+    color: black !important;
     z-index: 9999;
   }
-  /* Hide everything except receipt */
   nav, header, aside, footer,
   [data-no-print] { display: none !important; }
-}
-
-/* ── Language transition ── */
-.lang-transition {
-  transition: all 0.2s ease;
 }

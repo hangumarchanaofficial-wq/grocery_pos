@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // Sidebar — Premium dark navigation
 // ============================================================
 
@@ -9,18 +9,19 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, ShoppingCart, Package, Users,
-  BarChart3, Settings, Brain, LogOut,
+  BarChart3, Settings, Brain, LogOut, ShoppingBag,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import Badge from '@/components/ui/Badge';
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['OWNER', 'MANAGER', 'CASHIER'] },
-  { href: '/dashboard/billing', label: 'New Bill', icon: ShoppingCart, roles: ['OWNER', 'MANAGER', 'CASHIER'] },
-  { href: '/dashboard/inventory', label: 'Inventory', icon: Package, roles: ['OWNER', 'MANAGER'] },
-  { href: '/dashboard/customers', label: 'Customers', icon: Users, roles: ['OWNER', 'MANAGER', 'CASHIER'] },
-  { href: '/dashboard/reports', label: 'Reports', icon: BarChart3, roles: ['OWNER', 'MANAGER'] },
-  { href: '/dashboard/settings', label: 'Settings', icon: Settings, roles: ['OWNER'] },
+  { href: '/dashboard',           label: 'Dashboard', icon: LayoutDashboard, roles: ['OWNER', 'MANAGER', 'CASHIER'] },
+  { href: '/dashboard/billing',   label: 'New Bill',  icon: ShoppingCart,    roles: ['OWNER', 'MANAGER', 'CASHIER'] },
+  { href: '/dashboard/inventory', label: 'Inventory', icon: Package,         roles: ['OWNER', 'MANAGER'] },
+  { href: '/dashboard/products',  label: 'Products',  icon: ShoppingBag,     roles: ['OWNER', 'MANAGER'] },
+  { href: '/dashboard/customers', label: 'Customers', icon: Users,           roles: ['OWNER', 'MANAGER', 'CASHIER'] },
+  { href: '/dashboard/reports',   label: 'Reports',   icon: BarChart3,       roles: ['OWNER', 'MANAGER'] },
+  { href: '/dashboard/settings',  label: 'Settings',  icon: Settings,        roles: ['OWNER'] },
 ];
 
 export default function Sidebar() {
@@ -35,11 +36,11 @@ export default function Sidebar() {
       </div>
 
       {/* ── Nav ── */}
-      <nav className="flex-1 space-y-1 p-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
         {navItems
           .filter((item) => user && item.roles.includes(user.role))
           .map((item) => {
-            const isActive = pathname === item.href;
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             return (
               <Link
                 key={item.href}

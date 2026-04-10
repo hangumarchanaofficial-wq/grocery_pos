@@ -1,8 +1,11 @@
-// ============================================================
+﻿// ============================================================
 // Shared TypeScript Types
 // ============================================================
 
-import { Role, Category, PaymentMethod } from '@prisma/client';
+// ── Inline types (no Prisma dependency) ──
+export type Role = 'OWNER' | 'MANAGER' | 'CASHIER';
+export type Category = 'VEGETABLES' | 'FRUITS' | 'GROCERY_ITEMS' | 'FOODS' | 'COSMETIC' | 'CLOTHES' | 'OTHERS';
+export type PaymentMethod = 'CASH' | 'CARD' | 'QR';
 
 // ── API Response wrapper ──
 export interface ApiResponse<T = unknown> {
@@ -15,6 +18,7 @@ export interface ApiResponse<T = unknown> {
 export interface CartItem {
     productId: string;
     name: string;
+    productCode?: string;
     price: number;
     costPrice: number;
     quantity: number;

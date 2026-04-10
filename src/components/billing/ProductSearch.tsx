@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // Product Search - Search by name or scan barcode
 // ============================================================
 
@@ -57,6 +57,7 @@ export default function ProductSearch() {
         addItem({
             id: product.id,
             name: product.name,
+            productCode: product.barcode ?? undefined,
             price: product.price,
             costPrice: product.costPrice,
             quantity: product.quantity,
