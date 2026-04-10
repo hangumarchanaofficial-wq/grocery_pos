@@ -1,4 +1,4 @@
-import { adminClient } from '@/lib/supabase/admin';
+﻿import { adminClient } from '@/lib/supabase/admin';
 import { getUserFromRequest, hasRole, errorResponse, successResponse } from '@/lib/auth';
 import { transformRow } from '@/lib/utils';
 
@@ -59,7 +59,7 @@ export async function PUT(req: Request, { params }: RouteParams) {
 
 export async function DELETE(_req: Request, { params }: RouteParams) {
   const user = await getUserFromRequest();
-  if (!user || !hasRole(user, 'OWNER', 'MANAGER'))
+  if (!user || !hasRole(user, ['OWNER', 'MANAGER']))
     return errorResponse('Insufficient permissions', 403);
   const { id } = await params;
   const { error } = await adminClient.from('customers').delete().eq('id', id);

@@ -1,4 +1,4 @@
-import { adminClient } from '@/lib/supabase/admin';
+﻿import { adminClient } from '@/lib/supabase/admin';
 import { getUserFromRequest, errorResponse, successResponse } from '@/lib/auth';
 import { transformRow } from '@/lib/utils';
 
