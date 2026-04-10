@@ -1,5 +1,6 @@
 import { adminClient } from '@/lib/supabase/admin';
 import { getUserFromRequest, errorResponse, successResponse } from '@/lib/auth';
+import { transformRow } from '@/lib/utils';
 
 export async function POST(req: Request) {
   const user = await getUserFromRequest();
@@ -61,5 +62,21 @@ export async function POST(req: Request) {
     });
   }
 
-  return successResponse({ ...bill, items: billItems }, 201);
+  const normalizedBill = transformRow<Record<string, any>>(bill as Record<string, unknown>);
+
+  return successResponse({
+    ...normalizedBill,
+    user: { name: user.name },
+    customer: customerId ? { id: customerId } : null,
+    items: billItems.map((item: any, index: number) => ({
+      quantity: item.quantity,
+      price: item.price,
+      unitPrice: item.cost_price,
+      total: item.total,
+      product: {
+        name: items[index]?.name || `Item ${index + 1}`,
+        productCode: items[index]?.productCode || items[index]?.barcode || undefined,
+      },
+    })),
+  }, 201);
 }

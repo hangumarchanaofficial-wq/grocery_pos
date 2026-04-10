@@ -105,21 +105,21 @@ export default function ProductSearch() {
             </div>
 
             {showResults && results.length > 0 && (
-                <div className="glass-panel-strong absolute left-0 right-0 top-full z-50 mt-2 max-h-72 overflow-y-auto rounded-[24px]">
+                <div className="relative z-50 mt-3 overflow-hidden rounded-[22px] border border-white/10 bg-[rgba(12,20,40,0.98)] shadow-[0_24px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl">
                     {results.map((product) => (
                         <button
                             key={product.id}
                             onClick={() => handleSelect(product)}
-                            className="flex w-full items-center justify-between border-b border-white/6 px-4 py-4 text-left transition-colors last:border-0 hover:bg-white/[0.04]"
+                            className="flex w-full items-center justify-between gap-4 border-b border-white/6 px-5 py-3 text-left transition-colors last:border-0 hover:bg-white/[0.04]"
                         >
-                            <div>
-                                <p className="text-sm font-medium text-slate-100">{product.name}</p>
-                                <p className="text-xs text-slate-500">
+                            <div className="min-w-0">
+                                <p className="truncate text-sm font-semibold text-slate-100">{product.name}</p>
+                                <p className="mt-1 truncate text-xs text-slate-400">
                                     {product.category} | {product.quantity} {product.unit} in stock
                                     {product.barcode && ` | ${product.barcode}`}
                                 </p>
                             </div>
-                            <p className="text-sm font-semibold text-brand-300">
+                            <p className="shrink-0 text-sm font-semibold text-emerald-300">
                                 {formatCurrency(product.price)}
                             </p>
                         </button>

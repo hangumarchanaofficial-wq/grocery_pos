@@ -63,9 +63,10 @@ const Receipt = forwardRef<HTMLDivElement, ReceiptProps>(({ bill, forceLang }, r
   const invNo = bill.billNumber;
 
   // Format date like: 2026-03-30   13:07:25.
-  const dateObj = new Date(bill.createdAt);
-  const dateStr = dateObj.toISOString().slice(0, 10);
-  const timeStr = dateObj.toTimeString().slice(0, 8) + '.';
+  const dateObj = bill.createdAt ? new Date(bill.createdAt) : new Date();
+  const validDate = Number.isNaN(dateObj.getTime()) ? new Date() : dateObj;
+  const dateStr = validDate.toISOString().slice(0, 10);
+  const timeStr = validDate.toTimeString().slice(0, 8) + '.';
 
   // Total savings = sum of (unitPrice - price) * qty across items
   const totalSavings = bill.items.reduce((acc, item) => {

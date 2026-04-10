@@ -90,7 +90,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="space-y-6">
 
       {/* Header Card */}
       <Card className="glass-panel-strong overflow-hidden p-0">

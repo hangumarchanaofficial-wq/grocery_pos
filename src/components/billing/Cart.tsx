@@ -22,8 +22,8 @@ export default function Cart() {
     }
 
     return (
-        <div className="flex h-full flex-col">
-            <div className="flex-1 space-y-3 overflow-y-auto pr-1">
+        <div className="space-y-5">
+            <div className="space-y-3">
                 {items.map((item, index) => (
                     <div
                         key={item.productId}
@@ -72,7 +72,7 @@ export default function Cart() {
                 ))}
             </div>
 
-            <div className="mt-5 space-y-3 border-t border-white/8 pt-5">
+            <div className="space-y-3 border-t border-white/8 pt-5">
                 <div className="flex justify-between text-sm text-slate-400">
                     <span>Subtotal</span>
                     <span>{formatCurrency(getSubtotal())}</span>

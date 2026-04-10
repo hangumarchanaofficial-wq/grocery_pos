@@ -42,6 +42,17 @@ body {
   font-family: var(--font-mono), ui-monospace, monospace;
 }
 
+select,
+option,
+optgroup {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+select:focus {
+  color: #f8fafc;
+}
+
 /* ── App Shell ── */
 .app-shell {
   background:

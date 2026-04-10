@@ -12,7 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <ProtectedRoute>
-      <div className="flex h-screen bg-[#0a0a0f]">
+      <div className="flex min-h-screen bg-[#0a0a0f]">
         <div className="hidden lg:block">
           <Sidebar />
         </div>
@@ -29,10 +29,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         )}
 
-        <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col">
           <TopBar onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
 
-          <main className="flex-1 overflow-y-auto">
+          <main className="flex-1">
             <div className="min-h-full flex flex-col">
               <div className="flex-1 p-4 pb-24 sm:p-6 lg:p-8">
                 {children}

@@ -1,12 +1,13 @@
 // ============================================================
-// Product Table — Premium dark-themed product grid
+// Product Table - Premium dark-themed product grid
 // ============================================================
 
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { Edit, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Edit, Trash2 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { CATEGORIES } from '@/lib/constants';
 
@@ -30,7 +31,11 @@ interface ProductTableProps {
   userRole: string;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export default function ProductTable({ products, onEdit, onDelete, userRole }: ProductTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+
   const getCategoryEmoji = (cat: string) =>
     CATEGORIES.find((c) => c.value === cat)?.emoji || '📦';
 
@@ -48,6 +53,23 @@ export default function ProductTable({ products, onEdit, onDelete, userRole }: P
     return null;
   };
 
+  const totalPages = Math.max(1, Math.ceil(products.length / ITEMS_PER_PAGE));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [products]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const visibleProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return products.slice(start, start + ITEMS_PER_PAGE);
+  }, [currentPage, products]);
+
   if (products.length === 0) {
     return (
       <div className="glass-panel flex h-48 items-center justify-center rounded-[28px] text-slate-500">
@@ -55,6 +77,9 @@ export default function ProductTable({ products, onEdit, onDelete, userRole }: P
       </div>
     );
   }
+
+  const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  const endItem = Math.min(currentPage * ITEMS_PER_PAGE, products.length);
 
   return (
     <div className="glass-panel overflow-hidden rounded-[28px]">
@@ -86,11 +111,8 @@ export default function ProductTable({ products, onEdit, onDelete, userRole }: P
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.04]">
-            {products.map((product) => (
-              <tr
-                key={product.id}
-                className="transition-colors hover:bg-white/[0.02]"
-              >
+            {visibleProducts.map((product) => (
+              <tr key={product.id} className="transition-colors hover:bg-white/[0.02]">
                 <td className="px-5 py-4">
                   <div>
                     <p className="font-medium text-slate-100">{product.name}</p>
@@ -142,6 +164,35 @@ export default function ProductTable({ products, onEdit, onDelete, userRole }: P
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex items-center justify-between border-t border-white/8 px-5 py-4">
+        <p className="text-xs text-slate-500">
+          Showing {startItem}-{endItem} of {products.length} products
+        </p>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            disabled={currentPage === 1}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-slate-300 transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-40"
+            aria-label="Previous page"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <span className="min-w-16 text-center text-sm font-medium text-slate-300">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            type="button"
+            onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+            disabled={currentPage === totalPages}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-slate-300 transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-40"
+            aria-label="Next page"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );

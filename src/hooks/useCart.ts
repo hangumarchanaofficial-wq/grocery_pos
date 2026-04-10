@@ -17,6 +17,8 @@ export function useCart() {
         const items = cart.items.map((item) => ({
             productId: item.productId,
             quantity: item.quantity,
+            price: item.price,
+            costPrice: item.costPrice,
         }));
 
         const res = await apiFetch('/api/billing', {
