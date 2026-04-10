@@ -23,7 +23,7 @@ export async function GET(req: Request) {
   if (error) return errorResponse(error.message);
 
   const customers = (data || []).map((c: Record<string, unknown>) => ({
-    ...transformRow(c),
+    ...(transformRow<Record<string, unknown>>(c)),
     _count: { bills: Array.isArray(c.bills) ? (c.bills as unknown[]).length : 0 },
   }));
 

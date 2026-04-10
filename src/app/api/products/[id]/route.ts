@@ -1,66 +1,49 @@
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { calculateSellingPrice } from "@/lib/utils/pricing";
+import { adminClient } from '@/lib/supabase/admin';
+import { getUserFromRequest, hasRole, errorResponse, successResponse } from '@/lib/auth';
+import { transformRow } from '@/lib/utils';
 
-const prisma = new PrismaClient();
+interface RouteParams { params: Promise<{ id: string }> }
 
-interface RouteParams {
-  params: Promise<{ id: string }>;
+export async function GET(_req: Request, { params }: RouteParams) {
+  const user = await getUserFromRequest();
+  if (!user) return errorResponse('Unauthorized', 401);
+  const { id } = await params;
+  const { data, error } = await adminClient.from('products').select('*').eq('id', id).single();
+  if (error || !data) return errorResponse('Product not found', 404);
+  return successResponse(transformRow(data as Record<string, unknown>));
 }
 
-export async function PATCH(req: NextRequest, { params }: RouteParams) {
-  try {
-    const { id } = await params;
-    const body = await req.json();
+export async function PUT(req: Request, { params }: RouteParams) {
+  const user = await getUserFromRequest();
+  if (!user || !hasRole(user, 'OWNER', 'MANAGER'))
+    return errorResponse('Insufficient permissions', 403);
+  const { id } = await params;
+  const body = await req.json();
 
-    let sellingPrice: number | undefined;
+  const update: Record<string, unknown> = {};
+  if (body.name !== undefined) update.name = body.name;
+  if (body.barcode !== undefined) update.barcode = body.barcode || null;
+  if (body.category !== undefined) update.category = body.category;
+  if (body.price !== undefined) update.price = parseFloat(body.price);
+  if (body.costPrice !== undefined) update.cost_price = parseFloat(body.costPrice);
+  if (body.quantity !== undefined) update.quantity = parseInt(body.quantity);
+  if (body.unit !== undefined) update.unit = body.unit;
+  if (body.minStock !== undefined) update.min_stock = parseInt(body.minStock);
+  if (body.expiryDate !== undefined) update.expiry_date = body.expiryDate || null;
 
-    if (body.buyingPrice !== undefined || body.marginPercent !== undefined) {
-      const current = await prisma.product.findUnique({
-        where: { id },
-      });
-
-      if (!current) {
-        return NextResponse.json({ message: "Product not found" }, { status: 404 });
-      }
-
-      const buyingPrice = body.buyingPrice ?? current.buyingPrice;
-      const marginPercent = body.marginPercent ?? current.marginPercent;
-      sellingPrice = calculateSellingPrice(buyingPrice, marginPercent);
-    }
-
-    const product = await prisma.product.update({
-      where: { id },
-      data: {
-        ...body,
-        ...(sellingPrice !== undefined && { sellingPrice }),
-        updatedAt: new Date(),
-      },
-    });
-
-    return NextResponse.json(product);
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || "Failed to update product" },
-      { status: 500 }
-    );
-  }
+  const { data, error } = await adminClient
+    .from('products').update(update).eq('id', id).select().single();
+  if (error) return errorResponse(error.message);
+  return successResponse(transformRow(data as Record<string, unknown>));
 }
 
-export async function DELETE(_req: NextRequest, { params }: RouteParams) {
-  try {
-    const { id } = await params;
-
-    await prisma.product.update({
-      where: { id },
-      data: { isActive: false },
-    });
-
-    return NextResponse.json({ message: "Product deleted successfully" });
-  } catch {
-    return NextResponse.json(
-      { message: "Failed to delete product" },
-      { status: 500 }
-    );
-  }
+export async function DELETE(_req: Request, { params }: RouteParams) {
+  const user = await getUserFromRequest();
+  if (!user || !hasRole(user, 'OWNER'))
+    return errorResponse('Only owners can delete products', 403);
+  const { id } = await params;
+  const { error } = await adminClient
+    .from('products').update({ active: false }).eq('id', id);
+  if (error) return errorResponse(error.message);
+  return successResponse({ message: 'Product deleted' });
 }

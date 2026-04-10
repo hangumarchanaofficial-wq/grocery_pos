@@ -22,7 +22,7 @@ export async function GET(req: Request) {
   if (error) return errorResponse(error.message);
 
   const grouped: Record<string, { sales: number; profit: number; bills: number; productSales: Record<string, number> }> = {};
-  (bills || []).forEach((b: { total: number; created_at: string; bill_items: { total: number; cost_price: number; quantity: number; products: { name: string } }[] }) => {
+  (bills || []).forEach((b: any) => {
     const d = new Date(b.created_at);
     let key: string;
     if      (period === 'monthly') key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
@@ -32,9 +32,9 @@ export async function GET(req: Request) {
     grouped[key] = grouped[key] || { sales: 0, profit: 0, bills: 0, productSales: {} };
     grouped[key].sales  += b.total;
     grouped[key].bills  += 1;
-    b.bill_items.forEach((item) => {
+    (b.bill_items || []).forEach((item: any) => {
       grouped[key].profit += item.total - item.cost_price * item.quantity;
-      const n = item.products?.name;
+      const n = Array.isArray(item.products) ? item.products[0]?.name : item.products?.name;
       if (n) grouped[key].productSales[n] = (grouped[key].productSales[n] || 0) + item.quantity;
     });
   });
@@ -44,9 +44,9 @@ export async function GET(req: Request) {
     return { date, totalSales: Math.round(data.sales * 100) / 100, totalBills: data.bills, totalProfit: Math.round(data.profit * 100) / 100, topProduct: top ? top[0] : 'N/A' };
   });
 
-  const totalSales  = (bills || []).reduce((s: number, b: { total: number }) => s + b.total, 0);
-  const totalProfit = (bills || []).reduce((s: number, b: { bill_items: { total: number; cost_price: number; quantity: number }[] }) =>
-    s + b.bill_items.reduce((a, i) => a + i.total - i.cost_price * i.quantity, 0), 0);
+  const totalSales  = (bills || []).reduce((s: number, b: any) => s + b.total, 0);
+  const totalProfit = (bills || []).reduce((s: number, b: any) =>
+    s + (b.bill_items || []).reduce((a: number, i: any) => a + i.total - i.cost_price * i.quantity, 0), 0);
 
   return successResponse({
     report,

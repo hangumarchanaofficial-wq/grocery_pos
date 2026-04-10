@@ -34,7 +34,7 @@ export async function GET(_req: Request, { params }: RouteParams) {
     .sort((a, b) => b.count - a.count).slice(0, 5).map((p) => p.name);
 
   return successResponse({
-    ...transformRow(data as Record<string, unknown>),
+    ...(transformRow<Record<string, unknown>>(data as Record<string, unknown>)),
     stats: { totalSpent, visitCount: bills.length, favoriteProducts },
   });
 }

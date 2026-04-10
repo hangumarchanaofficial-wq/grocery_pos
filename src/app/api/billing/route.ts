@@ -2,7 +2,7 @@ import { adminClient } from '@/lib/supabase/admin';
 import { getUserFromRequest, errorResponse, successResponse } from '@/lib/auth';
 
 export async function POST(req: Request) {
-  const user = await getUserFromRequest(req as any);
+  const user = await getUserFromRequest();
   if (!user) return errorResponse('Unauthorized', 401);
 
   const { items, customerId, paymentMethod, paidAmount, discount } = await req.json();

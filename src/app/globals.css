@@ -147,3 +147,31 @@ body {
 .animate-pulse-dot {
   animation: pulse-dot 2s ease-in-out infinite;
 }
+/* ── Sinhala Font Support ── */
+.font-sinhala {
+  font-family: var(--font-sinhala), 'Noto Sans Sinhala', 'Iskoola Pota', sans-serif;
+}
+
+/* ── Receipt Print Isolation ── */
+@media print {
+  body * { visibility: hidden !important; }
+  .print-receipt,
+  .print-receipt * { visibility: visible !important; }
+  .print-receipt {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 80mm;
+    background: white;
+    color: black;
+    z-index: 9999;
+  }
+  /* Hide everything except receipt */
+  nav, header, aside, footer,
+  [data-no-print] { display: none !important; }
+}
+
+/* ── Language transition ── */
+.lang-transition {
+  transition: all 0.2s ease;
+}

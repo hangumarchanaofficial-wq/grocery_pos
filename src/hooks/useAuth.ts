@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from 'react';
 interface UserProfile {
   id: string;
   name: string;
+  email?: string;
   role: 'OWNER' | 'MANAGER' | 'CASHIER';
   active: boolean;
 }

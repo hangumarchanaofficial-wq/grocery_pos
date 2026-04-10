@@ -27,7 +27,7 @@ export default function AddProductForm({ onClose, onSuccess }: AddProductFormPro
     setValue,
     formState: { errors },
   } = useForm<CreateProductSchema>({
-    resolver: zodResolver(createProductSchema),
+    resolver: zodResolver(createProductSchema) as any,
     defaultValues: {
       category: "VEGETABLES",
       unit: "KG",
