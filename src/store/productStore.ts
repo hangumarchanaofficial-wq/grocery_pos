@@ -29,7 +29,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       const res = await fetch("/api/products");
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
-      set({ products: data, isLoading: false });
+      set({ products: data.products ?? data, isLoading: false });
     } catch (err: any) {
       set({ error: err.message, isLoading: false });
       toast.error("Failed to load products");

@@ -7,15 +7,19 @@
 
 import { useCallback } from 'react';
 import { useCartStore } from '@/store/cartStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import { useAuth } from './useAuth';
 
 export function useCart() {
     const cart = useCartStore();
+    const { settings } = useSettingsStore();
     const { apiFetch } = useAuth();
 
     const submitBill = useCallback(async (paymentMethod: string, paidAmount: number, discount: number = 0) => {
         const items = cart.items.map((item) => ({
             productId: item.productId,
+            name: item.name,
+            productCode: (item as any).productCode ?? (item as any).barcode ?? undefined,
             quantity: item.quantity,
             price: item.price,
             costPrice: item.costPrice,
@@ -29,6 +33,7 @@ export function useCart() {
                 paymentMethod,
                 discount,
                 paidAmount,
+                taxRate: settings.taxRate,
             }),
         });
 
@@ -40,7 +45,7 @@ export function useCart() {
         const bill = await res.json();
         cart.clearCart();
         return bill;
-    }, [cart, apiFetch]);
+    }, [cart, apiFetch, settings.taxRate]);
 
     return { ...cart, submitBill };
 }

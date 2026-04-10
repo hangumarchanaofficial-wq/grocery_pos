@@ -6,13 +6,14 @@ export async function POST(req: Request) {
   const user = await getUserFromRequest();
   if (!user) return errorResponse('Unauthorized', 401);
 
-  const { items, customerId, paymentMethod, paidAmount, discount } = await req.json();
+  const { items, customerId, paymentMethod, paidAmount, discount, taxRate } = await req.json();
   if (!items || !Array.isArray(items) || items.length === 0)
     return errorResponse('Cart is empty', 400);
 
   // Calculate totals
   const subtotal = items.reduce((s: number, i: any) => s + i.price * i.quantity, 0);
-  const tax      = Math.round(subtotal * 0.05 * 100) / 100;
+  const taxRateVal = typeof taxRate === 'number' ? taxRate / 100 : 0.05;
+  const tax      = Math.round(subtotal * taxRateVal * 100) / 100;
   const disc     = discount || 0;
   const total    = subtotal + tax - disc;
 

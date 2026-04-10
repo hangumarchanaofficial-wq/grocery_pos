@@ -299,7 +299,7 @@ const Receipt = forwardRef<HTMLDivElement, ReceiptProps>(({ bill, forceLang }, r
         {settings.showSavingsOnReceipt && totalSavings > 0 && (
           <div className="receipt-savings" style={{ marginTop: 6 }}>
             <div style={{ fontSize: 11, marginBottom: 2 }}>
-              {lang === 'si' ? 'ඔබ ඉතිරි කළා' : 'ඔබ ඉතිරි කළා'}
+              {lang === 'si' ? 'ඔබ ඉතිරි කළා' : 'You Saved'}
             </div>
             <div style={{ fontSize: 20, fontWeight: 900 }}>
               {totalSavings.toFixed(2)}
