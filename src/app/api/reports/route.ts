@@ -1,9 +1,9 @@
-import { adminClient } from '@/lib/supabase/admin';
+﻿import { adminClient } from '@/lib/supabase/admin';
 import { getUserFromRequest, hasRole, errorResponse, successResponse } from '@/lib/auth';
 
 export async function GET(req: Request) {
   const user = await getUserFromRequest();
-  if (!user || !hasRole(user, 'OWNER', 'MANAGER'))
+  if (!user || !hasRole(user, ['OWNER', 'MANAGER']))
     return errorResponse('Insufficient permissions', 403);
 
   const { searchParams } = new URL(req.url);
@@ -58,3 +58,4 @@ export async function GET(req: Request) {
     },
   });
 }
+

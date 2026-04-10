@@ -1,4 +1,4 @@
-import { adminClient } from '@/lib/supabase/admin';
+﻿import { adminClient } from '@/lib/supabase/admin';
 import { getUserFromRequest, hasRole, errorResponse, successResponse } from '@/lib/auth';
 import { transformRows, transformRow } from '@/lib/utils';
 
@@ -33,7 +33,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const user = await getUserFromRequest();
-  if (!user || !hasRole(user, 'OWNER', 'MANAGER'))
+  if (!user || !hasRole(user, ['OWNER', 'MANAGER']))
     return errorResponse('Insufficient permissions', 403);
 
   const body = await req.json();
@@ -62,3 +62,4 @@ export async function POST(req: Request) {
   );
   return successResponse(transformRow(data as Record<string, unknown>), 201);
 }
+
