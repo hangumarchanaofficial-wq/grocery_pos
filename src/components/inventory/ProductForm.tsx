@@ -1,5 +1,5 @@
 // ============================================================
-// Product Form — Create or Edit a product
+// Product Form - Create or Edit a product
 // ============================================================
 
 'use client';
@@ -84,7 +84,7 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Input
                     label="Product Name *"
                     value={form.name}
@@ -111,7 +111,7 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
                     options={UNITS.map((u) => ({ value: u, label: u }))}
                 />
                 <Input
-                    label="Selling Price (₹) *"
+                    label="Selling Price (LKR) *"
                     type="number"
                     value={form.price}
                     onChange={(e) => handleChange('price', e.target.value)}
@@ -121,7 +121,7 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
                     required
                 />
                 <Input
-                    label="Cost Price (₹)"
+                    label="Cost Price (LKR)"
                     type="number"
                     value={form.costPrice}
                     onChange={(e) => handleChange('costPrice', e.target.value)}

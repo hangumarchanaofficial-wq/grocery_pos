@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import Input from '@/components/ui/Input';
 import { CreditCard, ScanLine, WalletCards, UserPlus, Printer, ShoppingBag, Zap, Search, User, Package, Receipt as ReceiptIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { formatCurrency } from '@/lib/utils';
 
 export default function BillingPage() {
   const submitBill = useCart();
@@ -211,7 +212,7 @@ export default function BillingPage() {
             </div>
             {items.length > 0 && (
               <div className="rounded-[10px] bg-emerald-500/15 px-3 py-1.5 text-[11px] font-bold text-emerald-400">
-                Rs {subtotal.toLocaleString('en-IN')}
+                {formatCurrency(subtotal)}
               </div>
             )}
           </div>
@@ -240,17 +241,17 @@ export default function BillingPage() {
               <div className="mb-4 space-y-2 rounded-[16px] border border-white/[0.05] bg-white/[0.02] p-4">
                 <div className="flex items-center justify-between text-[12px]">
                   <span className="text-slate-500">Subtotal</span>
-                  <span className="font-medium text-slate-300">Rs {subtotal.toLocaleString('en-IN')}</span>
+                  <span className="font-medium text-slate-300">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex items-center justify-between text-[12px]">
                   <span className="text-slate-500">Tax (5%)</span>
-                  <span className="font-medium text-slate-300">Rs {Math.round(subtotal * 0.05).toLocaleString('en-IN')}</span>
+                  <span className="font-medium text-slate-300">{formatCurrency(Math.round(subtotal * 0.05))}</span>
                 </div>
                 <div className="my-2 border-t border-white/[0.06]" />
                 <div className="flex items-center justify-between">
                   <span className="text-[13px] font-semibold text-slate-200">Total</span>
                   <span className="text-[15px] font-bold text-emerald-400">
-                    Rs {Math.round(subtotal * 1.05).toLocaleString('en-IN')}
+                    {formatCurrency(Math.round(subtotal * 1.05))}
                   </span>
                 </div>
               </div>

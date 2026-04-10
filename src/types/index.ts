@@ -77,3 +77,5 @@ export interface CustomerInsight {
     lastVisit: string;
     favoriteProducts: string[];
 }
+
+export * from './product';

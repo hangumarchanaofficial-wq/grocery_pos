@@ -16,11 +16,11 @@ export function generateBillNumber(sequenceNum: number): string {
     return `BILL-${dateStr}-${String(sequenceNum).padStart(3, '0')}`;
 }
 
-/** Format currency (Indian Rupees) */
+/** Format currency (Sri Lankan Rupees) */
 export function formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-IN', {
+    return new Intl.NumberFormat('en-LK', {
         style: 'currency',
-        currency: 'INR',
+        currency: 'LKR',
         minimumFractionDigits: 2,
     }).format(amount);
 }

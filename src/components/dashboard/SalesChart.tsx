@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { ChevronDown, BarChart3 } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 const WINDOWS = [
   { label: '7 Days',    value: '7d',   days: 7,   period: 'daily'   },
@@ -63,7 +64,7 @@ export default function SalesChart({ data: initialData }: SalesChartProps) {
 
   const fmt = (v: number | string | readonly (string | number)[] | undefined) => {
     const n = typeof v === 'number' ? v : Number(Array.isArray(v) ? v[0] : v ?? 0);
-    return `Rs ${n.toLocaleString('en-IN')}`;
+    return formatCurrency(n);
   };
 
   return (
@@ -134,7 +135,7 @@ export default function SalesChart({ data: initialData }: SalesChartProps) {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.06)" vertical={false} />
               <XAxis dataKey={chartData[0]?.label ? 'label' : 'date'} tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={v => `Rs ${(v/1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={v => `LKR ${(v/1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
               <Tooltip
                 cursor={{ fill: 'rgba(255,255,255,0.025)' }}
                 contentStyle={{ borderRadius: '16px', border: '1px solid rgba(148,163,184,0.1)', background: 'rgba(8,16,32,0.97)', backdropFilter: 'blur(20px)', boxShadow: '0 32px 80px rgba(0,0,0,0.4)', color: '#e2e8f0', fontSize: '12px' }}
