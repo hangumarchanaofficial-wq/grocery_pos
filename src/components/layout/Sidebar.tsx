@@ -71,7 +71,7 @@ export default function Sidebar() {
           <div className="mt-4 border-t border-white/[0.04] pt-4">
             <p className="mb-2 px-3 label-caps text-slate-700">Intelligence</p>
             <Link
-              href="/dashboard?tab=ai"
+              href="/dashboard/intelligence"
               className="flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-medium text-violet-400 transition-colors hover:bg-violet-500/[0.06]"
             >
               <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-violet-500/10 ring-1 ring-violet-400/15">
@@ -107,3 +107,4 @@ export default function Sidebar() {
     </aside>
   );
 }
+

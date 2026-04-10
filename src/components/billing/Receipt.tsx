@@ -276,10 +276,12 @@ const Receipt = forwardRef<HTMLDivElement, ReceiptProps>(({ bill, forceLang }, r
         )}
 
         {/* ══ BALANCE (ALWAYS) ══ */}
-        <div className="receipt-row receipt-bold">
-          <span>{tr('balance')}</span>
-          <span>{bill.changeAmount > 0 ? '0.00' : bill.changeAmount.toFixed(2)}</span>
-        </div>
+        {bill.paymentMethod !== 'CASH' && (
+          <div className="receipt-row receipt-bold">
+            <span>{tr('balance')}</span>
+            <span>{bill.changeAmount > 0 ? '0.00' : bill.changeAmount.toFixed(2)}</span>
+          </div>
+        )}
 
         <div className="receipt-divider" />
 

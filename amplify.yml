@@ -1,0 +1,23 @@
+# AWS Amplify Hosting — Next.js (SSR + API routes)
+# Console: enable "SSR" / Web Compute when connecting the branch (Amplify usually auto-detects Next.js).
+# https://docs.aws.amazon.com/amplify/latest/userguide/deploy-nextjs-app.html
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci --cache .npm --prefer-offline
+    build:
+      commands:
+        # Avoid OOM on large Next.js builds
+        - export NODE_OPTIONS=--max-old-space-size=4096
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - .next/cache/**/*
+      - .npm/**/*
+      - node_modules/**/*
