@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     .order('name')
     .range((page - 1) * limit, page * limit - 1);
 
-  if (search) query = query.ilike('name', '%' + search + '%');
+  if (search) query = query.or(`name.ilike.%${search}%,barcode.ilike.%${search}%`);
   if (category) query = query.eq('category', category);
 
   const { data, count, error } = await query;

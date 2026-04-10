@@ -10,6 +10,7 @@ import { useCart } from '@/hooks/useCart';
 import { useCartStore } from '@/store/cartStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useAuth } from '@/hooks/useAuth';
+import { calculateBillTotals } from '@/lib/billing';
 import { t } from '@/lib/i18n';
 import Input from '@/components/ui/Input';
 import {
@@ -76,6 +77,10 @@ export default function BillingPage() {
   };
 
   const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const cartTotals = calculateBillTotals({
+    subtotal,
+    taxRatePercent: settings.taxRate,
+  });
 
   return (
     <div className="space-y-5">
@@ -214,14 +219,14 @@ export default function BillingPage() {
                 {settings.taxRate > 0 && (
                   <div className="flex items-center justify-between text-[12px]">
                     <span className="text-slate-500">{tr('tax')} ({settings.taxRate}%)</span>
-                    <span className="font-medium text-slate-300">{formatCurrency(Math.round(subtotal * settings.taxRate / 100))}</span>
+                    <span className="font-medium text-slate-300">{formatCurrency(cartTotals.tax)}</span>
                   </div>
                 )}
                 <div className="my-2 border-t border-white/[0.06]" />
                 <div className="flex items-center justify-between">
                   <span className="text-[13px] font-semibold text-slate-200">Total</span>
                   <span className="text-[15px] font-bold text-emerald-400">
-                    {formatCurrency(subtotal + Math.round(subtotal * settings.taxRate / 100))}
+                    {formatCurrency(cartTotals.total)}
                   </span>
                 </div>
               </div>

@@ -4,6 +4,8 @@
 // ============================================================
 
 import { create } from 'zustand';
+import { calculateBillTotals } from '@/lib/billing';
+import { useSettingsStore } from '@/store/settingsStore';
 import type { CartItem } from '@/types';
 
 interface CartStore {
@@ -93,7 +95,15 @@ export const useCartStore = create<CartStore>((set, get) => ({
     clearCart: () => set({ items: [], customerId: null, customerName: null }),
 
     getSubtotal: () => get().items.reduce((sum, item) => sum + item.total, 0),
-    getTax: () => get().getSubtotal() * 0.05,
-    getTotal: () => get().getSubtotal() + get().getTax(),
+    getTax: () => {
+        const subtotal = get().getSubtotal();
+        const taxRate = useSettingsStore.getState().settings.taxRate;
+        return calculateBillTotals({ subtotal, taxRatePercent: taxRate }).tax;
+    },
+    getTotal: () => {
+        const subtotal = get().getSubtotal();
+        const taxRate = useSettingsStore.getState().settings.taxRate;
+        return calculateBillTotals({ subtotal, taxRatePercent: taxRate }).total;
+    },
     getItemCount: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
 }));

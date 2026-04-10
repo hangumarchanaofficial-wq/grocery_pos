@@ -10,6 +10,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useCartStore } from '@/store/cartStore';
 import { useSettingsStore } from '@/store/settingsStore';
+import { calculateBillTotals } from '@/lib/billing';
 import { formatCurrency } from '@/lib/utils';
 import { Banknote, CreditCard, QrCode, CheckCircle } from 'lucide-react';
 
@@ -37,10 +38,11 @@ export default function PaymentModal({ open, onClose, onSubmit }: PaymentModalPr
 
     const discountNum = parseFloat(discount) || 0;
     const subtotal = getSubtotal();
-    const adjustedSubtotal = subtotal - discountNum;
-    const taxRate = settings.taxRate / 100;
-    const tax = adjustedSubtotal * taxRate;
-    const total = adjustedSubtotal + tax;
+    const { tax, total } = calculateBillTotals({
+        subtotal,
+        discount: discountNum,
+        taxRatePercent: settings.taxRate,
+    });
     const paid = parseFloat(paidAmount) || total;
     const change = Math.max(0, paid - total);
 
