@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Badge } from '@/components/ui/Badge';
+import Badge from '@/components/ui/Badge';
 import { CATEGORIES } from '@/lib/constants';
 import { formatCurrency } from '@/lib/utils';
 import {
@@ -163,3 +163,4 @@ export default function ProductTable({ products, onEdit, onDelete }: Props) {
     </div>
   );
 }
+
