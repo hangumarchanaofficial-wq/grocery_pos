@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
-import { Button } from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import Select from '@/components/ui/Select';
+import Button from '@/components/ui/Button';
 import { CATEGORIES, UNITS } from '@/lib/constants';
 import toast from 'react-hot-toast';
 
@@ -133,3 +133,4 @@ export default function ProductForm({ product, onSuccess, onCancel }: Props) {
     </form>
   );
 }
+

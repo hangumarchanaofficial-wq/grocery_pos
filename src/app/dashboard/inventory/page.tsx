@@ -4,12 +4,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import ProductTable from '@/components/inventory/ProductTable';
 import ProductForm from '@/components/inventory/ProductForm';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
-import { Modal } from '@/components/ui/Modal';
-import { Badge } from '@/components/ui/Badge';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import Select from '@/components/ui/Select';
+import Modal from '@/components/ui/Modal';
+import Badge from '@/components/ui/Badge';
 import { CATEGORIES } from '@/lib/constants';
 import { formatCurrency } from '@/lib/utils';
 import {
@@ -288,3 +288,5 @@ export default function InventoryPage() {
     </div>
   );
 }
+
+
