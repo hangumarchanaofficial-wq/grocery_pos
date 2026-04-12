@@ -29,32 +29,49 @@ export function useAuth() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        try {
-          const res = await fetch('/api/auth/me', { credentials: 'include' });
-          const data = await readJson<UserProfile & { error?: string }>(res);
-          setUser(res.ok ? (data as UserProfile) : null);
-        } catch {
-          setUser(null);
-        }
+    let cancelled = false;
+
+    async function syncProfileFromServer() {
+      if (cancelled) return;
+      try {
+        const res = await fetch('/api/auth/me', { credentials: 'include' });
+        const data = await readJson<UserProfile & { error?: string }>(res);
+        if (!cancelled) setUser(res.ok ? (data as UserProfile) : null);
+      } catch {
+        if (!cancelled) setUser(null);
       }
-      setLoading(false);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
-      if (event === 'SIGNED_IN') {
-        try {
-          const res = await fetch('/api/auth/me', { credentials: 'include' });
-          const data = await readJson<UserProfile & { error?: string }>(res);
-          setUser(res.ok ? (data as UserProfile) : null);
-        } catch {
+    }
+
+    // Do not call getUser() here — it races with onAuthStateChange (same cookie/Web Locks
+    // storage) and throws AbortError / lock errors. INITIAL_SESSION carries the current session.
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (cancelled) return;
+
+      if (event === 'INITIAL_SESSION') {
+        if (session?.user) {
+          await syncProfileFromServer();
+        } else {
           setUser(null);
         }
-      } else if (event === 'SIGNED_OUT') {
+        setLoading(false);
+        return;
+      }
+
+      if (event === 'SIGNED_IN') {
+        await syncProfileFromServer();
+        return;
+      }
+
+      if (event === 'SIGNED_OUT') {
         setUser(null);
       }
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {

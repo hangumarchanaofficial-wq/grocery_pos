@@ -90,15 +90,14 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
-
+    <div className="space-y-4 sm:space-y-6">
       {/* Header Card */}
       <Card className="glass-panel-strong overflow-hidden p-0">
-        <div className="px-6 py-6 lg:px-7">
-          <Badge variant="default" className="mb-4">
+        <div className="px-4 py-5 sm:px-6 sm:py-6 lg:px-7">
+          <Badge variant="default" className="mb-3 sm:mb-4">
             <Shield size={10} className="mr-1" /> Admin
           </Badge>
-          <h2 className="section-title text-3xl font-semibold">{tr('settings')}</h2>
+          <h2 className="section-title text-2xl font-semibold sm:text-3xl">{tr('settings')}</h2>
           <p className="section-subtitle mt-2 text-sm leading-6">
             {lang === 'si'
               ? 'ගබඩා වින්‍යාසය, පරිශීලක කළමනාකරණය සහ බදු සැකසුම්.'
@@ -108,21 +107,22 @@ export default function SettingsPage() {
       </Card>
 
       {/* ── LANGUAGE SETTINGS ── */}
-      <Card className="glass-panel-strong">
-        <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-500/12">
+      <Card className="glass-panel-strong !p-4 sm:!p-6">
+        <div className="mb-4 flex items-start gap-3 sm:mb-5 sm:items-center">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-500/12">
             <Languages size={18} className="text-blue-300" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-100">{tr('languageSettings')}</h3>
+          <h3 className="text-base font-semibold text-slate-100 sm:text-lg">{tr('languageSettings')}</h3>
         </div>
         <p className="mb-4 text-sm text-slate-400">{tr('languageHint')}</p>
 
         {/* Language Toggle */}
-        <div className="flex gap-3 mb-4">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row">
           {/* English Option */}
           <button
+            type="button"
             onClick={() => setLanguage('en')}
-            className={`flex-1 flex items-center gap-3 p-4 rounded-[18px] border-2 transition-all ${
+            className={`flex w-full min-w-0 items-center gap-3 rounded-[18px] border-2 p-3.5 transition-all sm:flex-1 sm:p-4 ${
               lang === 'en'
                 ? 'border-emerald-500 bg-emerald-500/10'
                 : 'border-white/10 bg-white/[0.02] hover:border-white/20'
@@ -133,13 +133,14 @@ export default function SettingsPage() {
               <div className="font-semibold text-slate-100">{tr('english')}</div>
               <div className="text-xs text-slate-500">English Interface</div>
             </div>
-            {lang === 'en' && <CheckCircle size={18} className="ml-auto text-emerald-400" />}
+            {lang === 'en' && <CheckCircle size={18} className="ml-auto shrink-0 text-emerald-400" />}
           </button>
 
           {/* Sinhala Option */}
           <button
+            type="button"
             onClick={() => setLanguage('si')}
-            className={`flex-1 flex items-center gap-3 p-4 rounded-[18px] border-2 transition-all ${
+            className={`flex w-full min-w-0 items-center gap-3 rounded-[18px] border-2 p-3.5 transition-all sm:flex-1 sm:p-4 ${
               lang === 'si'
                 ? 'border-emerald-500 bg-emerald-500/10'
                 : 'border-white/10 bg-white/[0.02] hover:border-white/20'
@@ -152,11 +153,11 @@ export default function SettingsPage() {
               </div>
               <div className="text-xs text-slate-500">සිංහල අතුරු මුහුණත</div>
             </div>
-            {lang === 'si' && <CheckCircle size={18} className="ml-auto text-emerald-400" />}
+            {lang === 'si' && <CheckCircle size={18} className="ml-auto shrink-0 text-emerald-400" />}
           </button>
         </div>
 
-        <div className="rounded-[14px] border border-blue-400/20 bg-blue-500/5 px-4 py-3 text-[12px] text-blue-300">
+        <div className="rounded-[14px] border border-blue-400/20 bg-blue-500/5 px-3 py-3 text-[12px] leading-relaxed text-blue-300 sm:px-4">
           <Globe size={12} className="inline mr-1" />
           {lang === 'si'
             ? 'වත්මන් භාෂාව: සිංහල — රිසිට්, මෙනු, සහ සියලු UI සිංහලෙන් දිස් වේ.'
@@ -165,15 +166,15 @@ export default function SettingsPage() {
       </Card>
 
       {/* ── STORE INFORMATION ── */}
-      <Card className="glass-panel-strong">
-        <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-500/12">
+      <Card className="glass-panel-strong !p-4 sm:!p-6">
+        <div className="mb-4 flex items-start gap-3 sm:mb-5 sm:items-center">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-500/12">
             <Store size={18} className="text-brand-300" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-100">{tr('storeInfo')}</h3>
+          <h3 className="text-base font-semibold text-slate-100 sm:text-lg">{tr('storeInfo')}</h3>
         </div>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
               label={tr('storeName')}
               value={storeForm.storeName}
@@ -187,7 +188,7 @@ export default function SettingsPage() {
               placeholder="ගබඩා නාමය (සිංහල)"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
               label={tr('address')}
               value={storeForm.address}
@@ -199,7 +200,7 @@ export default function SettingsPage() {
               onChange={e => setStoreForm({ ...storeForm, addressSi: e.target.value })}
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
               label={tr('phone')}
               value={storeForm.phone}
@@ -212,20 +213,24 @@ export default function SettingsPage() {
               onChange={e => setStoreForm({ ...storeForm, terminalId: parseInt(e.target.value) || 1 })}
             />
           </div>
-          <Button variant="primary" onClick={handleSaveStore}>{tr('saveChanges')}</Button>
+          <div className="pt-1">
+            <Button variant="primary" className="w-full sm:w-auto" onClick={handleSaveStore}>
+              {tr('saveChanges')}
+            </Button>
+          </div>
         </div>
       </Card>
 
       {/* ── RECEIPT SETTINGS ── */}
-      <Card className="glass-panel-strong">
-        <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-500/12">
+      <Card className="glass-panel-strong !p-4 sm:!p-6">
+        <div className="mb-4 flex items-start gap-3 sm:mb-5 sm:items-center">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-500/12">
             <Receipt size={18} className="text-amber-300" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-100">{tr('receiptSettings')}</h3>
+          <h3 className="text-base font-semibold text-slate-100 sm:text-lg">{tr('receiptSettings')}</h3>
         </div>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
               label={tr('receiptFooter')}
               value={storeForm.receiptFooter}
@@ -241,16 +246,17 @@ export default function SettingsPage() {
           </div>
 
           {/* Show Savings Toggle */}
-          <div className="flex items-center justify-between rounded-[16px] border border-white/10 bg-white/[0.02] px-4 py-3">
-            <div>
+          <div className="flex flex-col gap-3 rounded-[16px] border border-white/10 bg-white/[0.02] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0 pr-0 sm:pr-4">
               <p className="text-sm font-medium text-slate-200">{tr('showSavings')}</p>
               <p className="text-xs text-slate-500">
                 {lang === 'si' ? '"ඔබ ඉතිරි කළා" කොටස රිසිට් හි දිස් කරන්න' : 'Show "You Saved" box on the receipt'}
               </p>
             </div>
             <button
+              type="button"
               onClick={() => setStoreForm({ ...storeForm, showSavingsOnReceipt: !storeForm.showSavingsOnReceipt })}
-              className={`relative h-6 w-11 rounded-full transition-colors ${
+              className={`relative h-6 w-11 shrink-0 self-end rounded-full transition-colors sm:self-auto ${
                 storeForm.showSavingsOnReceipt ? 'bg-emerald-500' : 'bg-slate-600'
               }`}
             >
@@ -260,17 +266,19 @@ export default function SettingsPage() {
             </button>
           </div>
 
-          <Button variant="primary" onClick={handleSaveStore}>{tr('saveChanges')}</Button>
+          <Button variant="primary" className="w-full sm:w-auto" onClick={handleSaveStore}>
+            {tr('saveChanges')}
+          </Button>
         </div>
       </Card>
 
       {/* ── TAX SETTINGS ── */}
-      <Card className="glass-panel-strong">
-        <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-500/12">
+      <Card className="glass-panel-strong !p-4 sm:!p-6">
+        <div className="mb-4 flex items-start gap-3 sm:mb-5 sm:items-center">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-500/12">
             <Percent size={18} className="text-amber-300" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-100">{tr('taxConfig')}</h3>
+          <h3 className="text-base font-semibold text-slate-100 sm:text-lg">{tr('taxConfig')}</h3>
         </div>
         <div className="space-y-4">
           <Input
@@ -284,30 +292,34 @@ export default function SettingsPage() {
               ? 'බදු 0 ලෙස සකසන්නේ නම් රිසිට් හි බදු ලෙස නොපෙන්වේ.'
               : 'Set to 0 to disable tax display on receipts.'}
           </p>
-          <Button variant="primary" onClick={handleSaveStore}>{tr('saveChanges')}</Button>
+          <Button variant="primary" className="w-full sm:w-auto" onClick={handleSaveStore}>
+            {tr('saveChanges')}
+          </Button>
         </div>
       </Card>
 
       {/* ── USER MANAGEMENT ── */}
-      <Card className="glass-panel-strong">
-        <div className="mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-500/12">
+      <Card className="glass-panel-strong !p-4 sm:!p-6">
+        <div className="mb-4 flex flex-col gap-4 sm:mb-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3 sm:items-center">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-500/12">
               <Users size={18} className="text-sky-300" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-100">{tr('userManagement')}</h3>
+            <h3 className="text-base font-semibold text-slate-100 sm:text-lg">{tr('userManagement')}</h3>
           </div>
-          <Button size="sm" onClick={() => setShowAdd(true)}>
+          <Button size="sm" className="w-full shrink-0 sm:w-auto" onClick={() => setShowAdd(true)}>
             <Plus size={14} className="mr-1" /> {tr('addUser')}
           </Button>
         </div>
         <div className="rounded-[22px] border border-white/8 bg-white/[0.02]">
-          <div className="flex items-center justify-between px-5 py-4">
-            <div>
-              <p className="font-medium text-slate-100">{user.name}</p>
-              <p className="mt-0.5 text-sm text-slate-500">{user.email}</p>
+          <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+            <div className="min-w-0">
+              <p className="break-words font-medium text-slate-100">{user.name}</p>
+              <p className="mt-0.5 break-all text-sm text-slate-500">{user.email}</p>
             </div>
-            <Badge variant="success">{user.role}</Badge>
+            <Badge variant="success" className="w-fit shrink-0">
+              {user.role}
+            </Badge>
           </div>
         </div>
       </Card>
@@ -325,10 +337,12 @@ export default function SettingsPage() {
           <Select label={lang === 'si' ? 'භූමිකාව' : 'Role'}
             value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}
             options={ROLES.map((r) => ({ value: r.value, label: r.label }))} />
-          <div className="flex gap-3">
-            <Button type="submit" loading={saving}>{lang === 'si' ? 'සාදන්න' : 'Create User'}</Button>
-            <Button type="button" variant="secondary" onClick={() => setShowAdd(false)}>
+          <div className="flex flex-col-reverse gap-3 sm:flex-row">
+            <Button type="button" variant="secondary" className="w-full sm:w-auto" onClick={() => setShowAdd(false)}>
               {lang === 'si' ? 'අවලංගු කරන්න' : 'Cancel'}
+            </Button>
+            <Button type="submit" className="w-full sm:w-auto" loading={saving}>
+              {lang === 'si' ? 'සාදන්න' : 'Create User'}
             </Button>
           </div>
         </form>

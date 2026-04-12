@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import ProductSearch from '@/components/billing/ProductSearch';
+import CustomerSearch from '@/components/billing/CustomerSearch';
 import Cart from '@/components/billing/Cart';
 import PaymentModal from '@/components/billing/PaymentModal';
 import Receipt from '@/components/billing/Receipt';
@@ -9,10 +10,8 @@ import type { ReceiptBill } from '@/components/billing/Receipt';
 import { useCart } from '@/hooks/useCart';
 import { useCartStore } from '@/store/cartStore';
 import { useSettingsStore } from '@/store/settingsStore';
-import { useAuth } from '@/hooks/useAuth';
 import { calculateBillTotals } from '@/lib/billing';
 import { t } from '@/lib/i18n';
-import Input from '@/components/ui/Input';
 import {
   CreditCard,
   Package,
@@ -21,8 +20,7 @@ import {
   ScanLine,
   Search,
   ShoppingBag,
-  User,
-  UserPlus,
+  Users,
   WalletCards,
   Zap,
 } from 'lucide-react';
@@ -31,32 +29,14 @@ import { formatCurrency } from '@/lib/utils';
 
 export default function BillingPage() {
   const { submitBill } = useCart();
-  const { items, setCustomer, customerName } = useCartStore();
-  const { apiFetch } = useAuth();
+  const { items } = useCartStore();
   const { settings } = useSettingsStore();
   const lang = settings.language;
   const tr = (key: Parameters<typeof t>[1]) => t(lang, key);
 
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [lastBill, setLastBill] = useState<ReceiptBill | null>(null);
-  const [customerPhone, setCustomerPhone] = useState('');
   const receiptRef = useRef<HTMLDivElement>(null);
-
-  const handleCustomerLookup = async () => {
-    if (!customerPhone) return;
-    try {
-      const res = await apiFetch(`/api/customers?search=${customerPhone}`);
-      const data = await res.json();
-      if (data.length > 0) {
-        setCustomer(data[0].id, data[0].name);
-        toast.success(`${tr('customer')}: ${data[0].name}`);
-      } else {
-        toast.error('Customer not found');
-      }
-    } catch {
-      toast.error('Lookup failed');
-    }
-  };
 
   const handlePayment = async (method: string, paidAmount: number, discount: number) => {
     try {
@@ -119,13 +99,13 @@ export default function BillingPage() {
       </div>
 
       {/* ── MAIN POS AREA — stacks on mobile, side-by-side on desktop ── */}
-      <div className="grid gap-3 sm:gap-4 xl:grid-cols-[1fr_420px]">
+      <div className="mb-8 grid grid-cols-1 gap-3 sm:gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,420px)] xl:items-start xl:gap-6">
 
         {/* LEFT COLUMN — Search + Customer */}
         <div className="space-y-3 sm:space-y-4">
 
           {/* Product Search */}
-          <div className="premium-card animate-fade-up rounded-[16px] sm:rounded-[24px] p-3.5 sm:p-6" style={{ animationDelay: '0.05s' }}>
+          <div className="premium-card !overflow-visible animate-fade-up rounded-[16px] sm:rounded-[24px] p-3.5 sm:p-6" style={{ animationDelay: '0.05s' }}>
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/25 to-transparent" />
             <div className="relative mb-3 sm:mb-5 flex items-center gap-2.5 sm:gap-3">
               <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-[10px] sm:rounded-[14px] border border-sky-400/20 bg-sky-500/10 shadow-[0_6px_20px_rgba(56,189,248,0.1)]">
@@ -142,42 +122,18 @@ export default function BillingPage() {
           </div>
 
           {/* Customer Attach */}
-          <div className="premium-card animate-fade-up rounded-[16px] sm:rounded-[24px] p-3.5 sm:p-6" style={{ animationDelay: '0.1s' }}>
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/20 to-transparent" />
+          <div className="premium-card !overflow-visible animate-fade-up rounded-[16px] sm:rounded-[24px] p-3.5 sm:p-6" style={{ animationDelay: '0.1s' }}>
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/25 to-transparent" />
             <div className="relative mb-3 sm:mb-5 flex items-center gap-2.5 sm:gap-3">
-              <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-[10px] sm:rounded-[14px] border border-violet-400/20 bg-violet-500/10 shadow-[0_6px_20px_rgba(139,92,246,0.1)]">
-                <UserPlus size={14} className="text-violet-400 sm:[&]:w-[17px] sm:[&]:h-[17px]" />
+              <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-[10px] sm:rounded-[14px] border border-sky-400/20 bg-sky-500/10 shadow-[0_6px_20px_rgba(56,189,248,0.1)]">
+                <Users size={14} className="text-sky-400 sm:[&]:w-[17px] sm:[&]:h-[17px]" />
               </div>
               <div>
                 <h2 className="text-[13px] sm:text-[15px] font-semibold tracking-[-0.02em] text-slate-100">{tr('customer')}</h2>
-                <p className="text-[9px] sm:text-[11px] text-slate-500">Attach by phone number</p>
+                <p className="text-[9px] sm:text-[11px] text-slate-500">Search or attach by phone</p>
               </div>
             </div>
-            <div className="relative flex gap-2 sm:gap-3">
-              <div className="flex-1">
-                <Input
-                  placeholder="Phone number..."
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleCustomerLookup()}
-                />
-              </div>
-              <button
-                onClick={handleCustomerLookup}
-                className="flex items-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-[14px] border border-violet-400/20 bg-violet-500/10 px-3 sm:px-5 py-2.5 text-[12px] sm:text-[13px] font-semibold text-violet-300 transition-all hover:bg-violet-500/20 active:scale-[0.97]"
-              >
-                <User size={13} /> <span className="hidden sm:inline">Find</span>
-              </button>
-            </div>
-            {customerName && (
-              <div className="relative mt-2.5 sm:mt-3 flex items-center gap-2 rounded-xl sm:rounded-[14px] border border-emerald-400/20 bg-emerald-500/10 px-3 sm:px-4 py-2 sm:py-2.5">
-                <div className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-emerald-500/20 text-[9px] sm:text-[10px] font-bold text-emerald-400">
-                  {customerName[0].toUpperCase()}
-                </div>
-                <p className="text-[12px] sm:text-[13px] font-semibold text-emerald-300">{customerName}</p>
-                <span className="ml-auto text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-emerald-500">Linked</span>
-              </div>
-            )}
+            <CustomerSearch />
           </div>
 
           {/* Last Receipt — only shows after a bill */}
@@ -209,11 +165,15 @@ export default function BillingPage() {
         </div>
 
         {/* RIGHT COLUMN — Cart + Payment */}
-        <div className="premium-card animate-fade-up rounded-[16px] sm:rounded-[24px] xl:sticky xl:top-20 xl:self-start" style={{ animationDelay: '0.15s' }}>
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
+        <div
+          className="premium-card animate-fade-up isolate flex min-w-0 w-full flex-col overflow-hidden rounded-[16px] sm:rounded-[24px] hover:!translate-y-0 xl:sticky xl:top-6 xl:max-h-[calc(100dvh-3rem)] xl:overflow-y-auto"
+          style={{ animationDelay: '0.15s' }}
+        >
+          {/* Top accent — same absolute pattern as Product Lookup / Customer so rows align */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/35 to-transparent" aria-hidden />
 
           {/* Cart Header */}
-          <div className="relative flex items-center justify-between border-b border-white/[0.05] px-4 sm:px-6 py-3.5 sm:py-5">
+          <div className="relative flex items-center justify-between border-b border-white/[0.05] px-3.5 sm:px-6 py-3.5 sm:py-5">
             <div className="flex items-center gap-2.5 sm:gap-3">
               <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-[10px] sm:rounded-[14px] border border-emerald-400/20 bg-emerald-500/10 shadow-[0_6px_20px_rgba(34,197,94,0.1)]">
                 <ShoppingBag size={14} className="text-emerald-400 sm:[&]:w-[17px] sm:[&]:h-[17px]" />
@@ -231,15 +191,15 @@ export default function BillingPage() {
           </div>
 
           {/* Cart Body */}
-          <div className="relative px-3 sm:px-4 py-3">
+          <div className="relative min-h-0 flex-1 px-3.5 sm:px-6 py-3">
             {items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center gap-3 py-10 sm:py-14 text-center">
-                <div className="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-[16px] sm:rounded-[20px] border border-white/[0.05] bg-white/[0.02]">
-                  <Package size={24} className="text-slate-600 sm:[&]:w-[28px] sm:[&]:h-[28px]" />
+              <div className="flex flex-col items-center justify-center gap-2.5 py-8 text-center sm:gap-3 sm:py-10">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.06] bg-white/[0.02] sm:h-14 sm:w-14">
+                  <Package size={22} className="text-slate-600 sm:h-6 sm:w-6" />
                 </div>
                 <div>
-                  <p className="text-[13px] sm:text-[14px] font-semibold text-slate-400">Cart is empty</p>
-                  <p className="mt-0.5 text-[11px] sm:text-[12px] text-slate-600">Search or scan products to begin</p>
+                  <p className="text-[13px] font-semibold text-slate-400 sm:text-[14px]">Cart is empty</p>
+                  <p className="mt-0.5 text-[11px] text-slate-600 sm:text-[12px]">Search or scan products to begin</p>
                 </div>
               </div>
             ) : (

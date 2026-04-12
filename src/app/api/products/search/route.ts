@@ -16,7 +16,7 @@ export async function GET(req: Request) {
     .gt('quantity', 0)
     .or('name.ilike.%' + q + '%,barcode.ilike.%' + q + '%')
     .order('name')
-    .limit(10);
+    .limit(100);
 
   if (error) return errorResponse(error.message);
   return successResponse(transformRows(data || []));

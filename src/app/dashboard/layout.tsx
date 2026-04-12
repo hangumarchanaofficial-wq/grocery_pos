@@ -1,14 +1,46 @@
 ﻿'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Sidebar from '@/components/layout/Sidebar';
 import TopBar from '@/components/layout/TopBar';
 import MobileNav from '@/components/layout/MobileNav';
 import ProtectedRoute from '@/components/layout/ProtectedRoute';
 import Footer from '@/components/layout/Footer';
 
+const MOBILE_MENU_CLOSE_DELAY_MS = 2000;
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigateCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearPendingMenuClose = useCallback(() => {
+    if (navigateCloseTimerRef.current) {
+      clearTimeout(navigateCloseTimerRef.current);
+      navigateCloseTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleMobileMenuClose = useCallback(() => {
+    clearPendingMenuClose();
+    navigateCloseTimerRef.current = setTimeout(() => {
+      setMobileMenuOpen(false);
+      navigateCloseTimerRef.current = null;
+    }, MOBILE_MENU_CLOSE_DELAY_MS);
+  }, [clearPendingMenuClose]);
+
+  const closeMobileMenuNow = useCallback(() => {
+    clearPendingMenuClose();
+    setMobileMenuOpen(false);
+  }, [clearPendingMenuClose]);
+
+  const toggleMobileMenu = useCallback(() => {
+    setMobileMenuOpen((open) => {
+      if (open) clearPendingMenuClose();
+      return !open;
+    });
+  }, [clearPendingMenuClose]);
+
+  useEffect(() => () => clearPendingMenuClose(), [clearPendingMenuClose]);
 
   return (
     <ProtectedRoute>
@@ -21,16 +53,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="fixed inset-0 z-40 lg:hidden">
             <div
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={closeMobileMenuNow}
             />
-            <div className="relative z-50 h-full w-72">
-              <Sidebar />
+            <div className="relative z-50 h-full w-[min(100%,280px)] max-w-[85vw]">
+              <Sidebar onNavigate={scheduleMobileMenuClose} />
             </div>
           </div>
         )}
 
         <div className="flex flex-1 flex-col overflow-x-hidden">
-          <TopBar onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
+          <TopBar menuOpen={mobileMenuOpen} onMenuToggle={toggleMobileMenu} />
 
           <main className="flex-1">
             <div className="min-h-full flex flex-col">
@@ -42,7 +74,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </main>
 
-          <MobileNav />
+          {!mobileMenuOpen && <MobileNav />}
         </div>
       </div>
     </ProtectedRoute>

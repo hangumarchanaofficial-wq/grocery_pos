@@ -9,6 +9,7 @@ import AlertsPanel from '@/components/dashboard/AlertsPanel';
 import PredictionCard from '@/components/ai/PredictionCard';
 import { ShoppingCart, Package, Brain, Activity, Zap, Clock, Target, Sparkles, TrendingUp, Shield } from 'lucide-react';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 const FALLBACK = {
   stats: { todaySales: 0, todayBills: 0, todayProfit: 0, totalProducts: 0, lowStockCount: 0, expiringCount: 0 },
@@ -24,6 +25,37 @@ const FALLBACK = {
 };
 
 type DashboardData = typeof FALLBACK;
+
+/** Tailwind cannot emit dynamic `bg-${color}-*` strings; use explicit maps for mobile + desktop. */
+const STATUS_MINI: Record<
+  'emerald' | 'sky' | 'violet',
+  { iconWrap: string; icon: string }
+> = {
+  emerald: { iconWrap: 'bg-emerald-500/10', icon: 'text-emerald-400' },
+  sky: { iconWrap: 'bg-sky-500/10', icon: 'text-sky-400' },
+  violet: { iconWrap: 'bg-violet-500/10', icon: 'text-violet-400' },
+};
+
+const INTEL_ROW: Record<
+  'amber' | 'emerald' | 'sky',
+  { row: string; icon: string; label: string }
+> = {
+  amber: {
+    row: 'border-amber-400/12 bg-amber-500/[0.06] hover:bg-amber-500/[0.09]',
+    icon: 'text-amber-400',
+    label: 'text-amber-400',
+  },
+  emerald: {
+    row: 'border-emerald-400/12 bg-emerald-500/[0.06] hover:bg-emerald-500/[0.09]',
+    icon: 'text-emerald-400',
+    label: 'text-emerald-400',
+  },
+  sky: {
+    row: 'border-sky-400/12 bg-sky-500/[0.06] hover:bg-sky-500/[0.09]',
+    icon: 'text-sky-400',
+    label: 'text-sky-400',
+  },
+};
 
 export default function DashboardPage() {
   const { apiFetch, user } = useAuth();
@@ -63,6 +95,7 @@ export default function DashboardPage() {
 
   const greeting = time.getHours() < 12 ? 'Good morning' : time.getHours() < 17 ? 'Good afternoon' : 'Good evening';
   const firstName = user?.name?.split(' ')[0] ?? 'there';
+  const showManageStock = ['OWNER', 'MANAGER'].includes(user?.role ?? '');
 
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -91,16 +124,27 @@ export default function DashboardPage() {
               <p className="mt-3 sm:mt-4 max-w-md text-[11.5px] sm:text-[13px] leading-[1.7] text-slate-400">
                 Your store is operating smoothly. Monitor floor activity, push invoices, and stay ahead of stock risks.
               </p>
-              <div className="mt-4 sm:mt-6 flex flex-wrap gap-2.5 sm:gap-3">
-                <Link href="/dashboard/billing">
-                  <button className="flex items-center gap-2 rounded-[12px] sm:rounded-[14px] bg-emerald-500 px-4 sm:px-5 py-2.5 text-[12px] sm:text-sm font-semibold text-slate-950 shadow-[0_8px_32px_rgba(34,197,94,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_12px_40px_rgba(34,197,94,0.4)] active:scale-[0.97]">
-                    <ShoppingCart size={15} /> Open Register
+              <div
+                className={cn(
+                  'mt-4 sm:mt-6 grid gap-2.5 sm:flex sm:flex-wrap sm:gap-3',
+                  showManageStock ? 'grid-cols-2' : 'grid-cols-1'
+                )}
+              >
+                <Link href="/dashboard/billing" className="min-w-0">
+                  <button
+                    type="button"
+                    className="flex w-full min-w-0 items-center justify-center gap-2 rounded-[12px] sm:rounded-[14px] bg-emerald-500 px-3 sm:px-5 py-2.5 text-[12px] sm:text-sm font-semibold text-slate-950 shadow-[0_8px_32px_rgba(34,197,94,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_12px_40px_rgba(34,197,94,0.4)] active:scale-[0.97]"
+                  >
+                    <ShoppingCart size={15} className="shrink-0" /> <span className="truncate">Open Register</span>
                   </button>
                 </Link>
-                {['OWNER', 'MANAGER'].includes(user?.role ?? '') && (
-                  <Link href="/dashboard/inventory">
-                    <button className="flex items-center gap-2 rounded-[12px] sm:rounded-[14px] border border-white/[0.09] bg-white/[0.05] px-4 sm:px-5 py-2.5 text-[12px] sm:text-sm font-semibold text-slate-200 transition-all hover:border-white/[0.15] hover:bg-white/[0.08] hover:text-white active:scale-[0.97]">
-                      <Package size={15} /> Manage Stock
+                {showManageStock && (
+                  <Link href="/dashboard/inventory" className="min-w-0">
+                    <button
+                      type="button"
+                      className="flex w-full min-w-0 items-center justify-center gap-2 rounded-[12px] sm:rounded-[14px] border border-white/[0.09] bg-white/[0.05] px-3 sm:px-5 py-2.5 text-[12px] sm:text-sm font-semibold text-slate-200 transition-all hover:border-white/[0.15] hover:bg-white/[0.08] hover:text-white active:scale-[0.97]"
+                    >
+                      <Package size={15} className="shrink-0" /> <span className="truncate">Manage Stock</span>
                     </button>
                   </Link>
                 )}
@@ -108,22 +152,25 @@ export default function DashboardPage() {
             </div>
             {/* Mini status cards */}
             <div className="grid w-full grid-cols-3 gap-2 sm:gap-2.5 lg:w-[240px] lg:grid-cols-1">
-              {[
-                { label: 'Register', value: 'Online', sub: 'Syncing live', icon: Activity, color: 'emerald' },
-                { label: 'Time', value: time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }), sub: time.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }), icon: Clock, color: 'sky' },
-                { label: 'AI Engine', value: 'Active', sub: 'Predictions live', icon: Sparkles, color: 'violet' },
-              ].map((card) => (
-                <div key={card.label} className="rounded-[10px] sm:rounded-[14px] border border-white/[0.06] bg-white/[0.025] p-2.5 sm:p-3.5 transition-all duration-300 hover:bg-white/[0.04]">
-                  <div className="mb-1.5 sm:mb-2.5 flex items-center justify-between">
-                    <span className="text-[7px] sm:text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500">{card.label}</span>
-                    <div className={`flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-md sm:rounded-lg bg-${card.color}-500/10`}>
-                      <card.icon size={10} className={`text-${card.color}-400 sm:[&]:w-3 sm:[&]:h-3`} />
+              {([
+                { label: 'Register', value: 'Online', sub: 'Syncing live', icon: Activity, color: 'emerald' as const },
+                { label: 'Time', value: time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }), sub: time.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }), icon: Clock, color: 'sky' as const },
+                { label: 'AI Engine', value: 'Active', sub: 'Predictions live', icon: Sparkles, color: 'violet' as const },
+              ]).map((card) => {
+                const st = STATUS_MINI[card.color];
+                return (
+                  <div key={card.label} className="rounded-[10px] sm:rounded-[14px] border border-white/[0.06] bg-white/[0.025] p-2.5 sm:p-3.5 transition-all duration-300 hover:bg-white/[0.04]">
+                    <div className="mb-1.5 sm:mb-2.5 flex items-center justify-between">
+                      <span className="text-[7px] sm:text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500">{card.label}</span>
+                      <div className={`flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-md sm:rounded-lg ${st.iconWrap}`}>
+                        <card.icon size={10} className={`${st.icon} sm:w-3 sm:h-3`} />
+                      </div>
                     </div>
+                    <p className="text-[11px] sm:text-[13px] font-semibold tabular-nums text-slate-100">{card.value}</p>
+                    <p className="mt-0.5 text-[9px] sm:text-[10px] text-slate-600">{card.sub}</p>
                   </div>
-                  <p className="text-[11px] sm:text-[13px] font-semibold tabular-nums text-slate-100">{card.value}</p>
-                  <p className="mt-0.5 text-[9px] sm:text-[10px] text-slate-600">{card.sub}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -143,19 +190,22 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="space-y-2 sm:space-y-2.5">
-              {[
-                { icon: Target, label: 'Priority', color: 'amber', text: 'Review perishables before close \u2014 items nearing expiry date.' },
-                { icon: Zap, label: 'Throughput', color: 'emerald', text: 'Invoice pace is strong today. Push express checkout if queue grows.' },
-                { icon: TrendingUp, label: 'Trend', color: 'sky', text: 'Weekend sales peak after 17:00. Prepare for higher foot traffic.' },
-              ].map((item) => (
-                <div key={item.label} className={`rounded-[12px] sm:rounded-[14px] border border-${item.color}-400/[0.12] bg-${item.color}-500/[0.06] p-3 sm:p-3.5 transition-all duration-300 hover:bg-${item.color}-500/[0.09]`}>
-                  <div className="mb-1 sm:mb-1.5 flex items-center gap-2">
-                    <item.icon size={10} className={`text-${item.color}-400`} />
-                    <span className={`text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.2em] text-${item.color}-400`}>{item.label}</span>
+              {([
+                { icon: Target, label: 'Priority', color: 'amber' as const, text: 'Review perishables before close \u2014 items nearing expiry date.' },
+                { icon: Zap, label: 'Throughput', color: 'emerald' as const, text: 'Invoice pace is strong today. Push express checkout if queue grows.' },
+                { icon: TrendingUp, label: 'Trend', color: 'sky' as const, text: 'Weekend sales peak after 17:00. Prepare for higher foot traffic.' },
+              ]).map((item) => {
+                const row = INTEL_ROW[item.color];
+                return (
+                  <div key={item.label} className={`rounded-[12px] sm:rounded-[14px] border p-3 sm:p-3.5 transition-all duration-300 ${row.row}`}>
+                    <div className="mb-1 sm:mb-1.5 flex items-center gap-2">
+                      <item.icon size={10} className={row.icon} />
+                      <span className={`text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.2em] ${row.label}`}>{item.label}</span>
+                    </div>
+                    <p className="text-[11px] sm:text-[12.5px] leading-[1.6] text-slate-300">{item.text}</p>
                   </div>
-                  <p className="text-[11px] sm:text-[12.5px] leading-[1.6] text-slate-300">{item.text}</p>
-                </div>
-              ))}
+                );
+              })}
               <div className="rounded-[10px] sm:rounded-[12px] border border-white/[0.05] bg-white/[0.02] p-2 sm:p-2.5">
                 <div className="flex items-center gap-2 text-slate-600"><Shield size={10} /><span className="text-[9px] sm:text-[10px]">All systems secure &middot; Last sync 1 min ago</span></div>
               </div>

@@ -18,6 +18,8 @@ interface CartStore {
         id: string;
         name: string;
         productCode?: string;
+        category?: string;
+        unit?: string;
         price: number;
         costPrice: number;
         quantity: number; // available stock
@@ -63,6 +65,8 @@ export const useCartStore = create<CartStore>((set, get) => ({
                         productId: product.id,
                         name: product.name,
                         productCode: product.productCode,
+                        category: product.category,
+                        unit: product.unit,
                         price: product.price,
                         costPrice: product.costPrice,
                         quantity: 1,

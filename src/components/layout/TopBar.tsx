@@ -8,12 +8,15 @@ import { useState, useEffect } from 'react';
 import { Menu, Bell, ShoppingCart, Zap } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import Badge from '@/components/ui/Badge';
+import { cn } from '@/lib/utils';
 
 interface TopBarProps {
   onMenuToggle: () => void;
+  /** When true, header is hidden on small screens (e.g. mobile drawer open). */
+  menuOpen?: boolean;
 }
 
-export default function TopBar({ onMenuToggle }: TopBarProps) {
+export default function TopBar({ onMenuToggle, menuOpen = false }: TopBarProps) {
   const { user, apiFetch } = useAuth();
   const [alertCount, setAlertCount] = useState(0);
 
@@ -29,7 +32,12 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   }, [apiFetch]);
 
   return (
-    <header className="sticky top-0 z-40 px-3 pt-3 lg:px-4 lg:pt-4">
+    <header
+      className={cn(
+        'sticky top-0 z-40 px-3 pt-3 lg:px-4 lg:pt-4',
+        menuOpen && 'hidden lg:block'
+      )}
+    >
       <div className="glass mx-auto flex items-center justify-between rounded-[20px] px-4 py-2.5 lg:px-5">
         {/* Mobile menu */}
         <button

@@ -6,7 +6,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-auto border-t border-white/[0.06] hidden sm:block">
+    <footer className="relative z-10 mt-auto border-t border-white/[0.06] bg-[#0a0a0f] hidden sm:block">
       {/* Subtle glow line at top */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
 
@@ -62,7 +62,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {[
                 { label: 'Customers', href: '/dashboard/customers' },
-                { label: 'AI Insights', href: '/dashboard/intelligence' },
+                { label: 'Smart Insights', href: '/dashboard/intelligence' },
                 { label: 'Settings', href: '/dashboard/settings' },
               ].map((link) => (
                 <li key={link.href}>

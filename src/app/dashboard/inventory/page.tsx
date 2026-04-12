@@ -1,21 +1,18 @@
 ﻿'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import ProductTable from '@/components/inventory/ProductTable';
 import ProductForm from '@/components/inventory/ProductForm';
-import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
-import Select from '@/components/ui/Select';
 import Modal from '@/components/ui/Modal';
 import Badge from '@/components/ui/Badge';
 import { CATEGORIES } from '@/lib/constants';
 import { formatCurrency } from '@/lib/utils';
 import {
   Package, Search, Plus, Filter, AlertTriangle,
-  XCircle, LayoutGrid, Layers, TrendingDown,
-  ShieldCheck, ArrowUpDown, Box, Warehouse
+  XCircle, LayoutGrid, TrendingDown, ShieldCheck, ArrowUpDown,
+  Box, Warehouse, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -40,6 +37,7 @@ export default function InventoryPage() {
   const [category, setCategory] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [mobilePage, setMobilePage] = useState(0);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -84,6 +82,17 @@ export default function InventoryPage() {
   };
 
   const totalProducts = products.length;
+  const mobilePerPage = 10;
+  const mobileTotalPages = Math.max(1, Math.ceil(products.length / mobilePerPage));
+  const mobileMaxPage = Math.max(0, mobileTotalPages - 1);
+  const activeMobilePage = Math.min(mobilePage, mobileMaxPage);
+  const mobileProducts = useMemo(() => {
+    const start = activeMobilePage * mobilePerPage;
+    return products.slice(start, start + mobilePerPage);
+  }, [products, activeMobilePage]);
+  const mobileRangeStart = products.length === 0 ? 0 : activeMobilePage * mobilePerPage + 1;
+  const mobileRangeEnd = Math.min((activeMobilePage + 1) * mobilePerPage, products.length);
+
   const lowStock = products.filter(p => p.minimumStock && p.quantity <= p.minimumStock && p.quantity > 0).length;
   const outOfStock = products.filter(p => p.quantity === 0).length;
   const categories = [...new Set(products.map(p => p.category))].length;
@@ -197,60 +206,74 @@ export default function InventoryPage() {
         </div>
       ) : (
         <>
-          {/* Mobile Card Grid */}
-          <div className="block lg:hidden space-y-2">
-            {products.map(p => {
+          {/* Mobile card rows (matches requested content layout) */}
+          <div className="space-y-2 lg:hidden">
+            {mobileProducts.map((p) => {
               const isLow = p.minimumStock && p.quantity <= p.minimumStock && p.quantity > 0;
               const isOut = p.quantity === 0;
-              const catEmoji = CATEGORIES.find(c => c.value === p.category)?.label?.split(' ')[0] || '📦';
+              const catObj = CATEGORIES.find((c) => c.value === p.category);
+              const categoryLabel = catObj?.label
+                ?? p.category.charAt(0) + p.category.slice(1).toLowerCase();
+
               return (
                 <div
                   key={p.id}
-                  className="rounded-xl border border-white/[0.05] bg-white/[0.02] backdrop-blur-sm p-3 active:bg-white/[0.04] transition"
+                  className="rounded-[14px] border border-white/[0.06] bg-white/[0.02] px-3 py-2.5"
                 >
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-sm">{catEmoji}</span>
-                        <p className="text-sm font-semibold text-white truncate">{p.name}</p>
-                      </div>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {p.category.charAt(0) + p.category.slice(1).toLowerCase()}
-                        {p.barcode && ` · ${p.barcode}`}
+                      <p className="text-[13px] leading-snug text-slate-100">
+                        <span className="font-normal text-slate-400">{categoryLabel} </span>
+                        <span className="font-semibold text-white">{p.name}</span>
+                      </p>
+                      <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
+                        {categoryLabel}
+                        {p.barcode ? ` · ${p.barcode}` : ''}
                       </p>
                     </div>
-                    <p className="text-sm font-bold text-emerald-400 shrink-0 tabular-nums">
+                    <p className="shrink-0 pt-0.5 text-right text-[13px] font-semibold tabular-nums text-emerald-400">
                       {formatCurrency(p.price)}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-white/[0.04]">
-                    <div className="flex items-center gap-2">
-                      <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md ${
-                        isOut ? 'bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20' :
-                        isLow ? 'bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20' :
-                        'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20'
-                      }`}>
-                        {isOut ? <XCircle className="w-3 h-3" /> : isLow ? <AlertTriangle className="w-3 h-3" /> : <ShieldCheck className="w-3 h-3" />}
+                  <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-2.5">
+                    <span className={`inline-flex min-w-0 items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-medium tabular-nums ring-1 ${
+                      isOut
+                        ? 'bg-rose-500/10 text-rose-400 ring-rose-500/20'
+                        : isLow
+                          ? 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
+                          : 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20'
+                    }`}>
+                      {isOut ? (
+                        <XCircle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                      ) : isLow ? (
+                        <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                      ) : (
+                        <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                      )}
+                      <span className="truncate">
                         {p.quantity} {p.unit}
                       </span>
-                      {isOut && <span className="text-[10px] text-rose-400">OUT</span>}
-                      {isLow && !isOut && <span className="text-[10px] text-amber-400">LOW</span>}
-                    </div>
+                    </span>
+
                     {canManage && (
-                      <div className="flex items-center gap-1">
+                      <div className="flex shrink-0 items-center gap-1">
                         <button
+                          type="button"
                           onClick={() => handleEdit(p)}
-                          className="p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-white/[0.06] transition"
+                          className="rounded-lg p-1.5 text-slate-400 transition hover:bg-white/[0.06] hover:text-white"
+                          aria-label={`Edit ${p.name}`}
                         >
-                          <ArrowUpDown className="w-3.5 h-3.5" />
+                          <ArrowUpDown className="h-4 w-4" />
                         </button>
                         {user?.role === 'OWNER' && (
                           <button
+                            type="button"
                             onClick={() => handleDelete(p.id)}
-                            className="p-1.5 rounded-md text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition"
+                            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-rose-500/10 hover:text-rose-400"
+                            aria-label={`Delete ${p.name}`}
                           >
-                            <XCircle className="w-3.5 h-3.5" />
+                            <XCircle className="h-4 w-4" />
                           </button>
                         )}
                       </div>
@@ -259,9 +282,44 @@ export default function InventoryPage() {
                 </div>
               );
             })}
+
+            {products.length > mobilePerPage && (
+              <div className="flex flex-col gap-2 border-t border-white/[0.06] pt-3">
+                <p className="text-center text-[11px] text-slate-500">
+                  <span className="tabular-nums text-slate-400">{mobileRangeStart}</span>
+                  {'–'}
+                  <span className="tabular-nums text-slate-400">{mobileRangeEnd}</span>
+                  <span className="text-slate-600"> of </span>
+                  <span className="tabular-nums text-slate-400">{products.length}</span>
+                </p>
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setMobilePage((p) => Math.max(0, p - 1))}
+                    disabled={activeMobilePage <= 0}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-slate-300 transition-all hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-35"
+                    aria-label="Previous page"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <span className="min-w-[3.5rem] text-center text-[11px] tabular-nums text-slate-500">
+                    {activeMobilePage + 1}/{mobileTotalPages}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setMobilePage((p) => Math.min(mobileMaxPage, p + 1))}
+                    disabled={activeMobilePage >= mobileMaxPage}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-slate-300 transition-all hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-35"
+                    aria-label="Next page"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Desktop Table */}
+          {/* Desktop table */}
           <div className="hidden lg:block">
             <ProductTable
               products={products}

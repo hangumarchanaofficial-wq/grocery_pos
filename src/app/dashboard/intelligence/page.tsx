@@ -63,16 +63,11 @@ export default function IntelligencePage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-violet-400/20 bg-violet-500/15">
-            <Brain size={20} className="text-violet-300" />
-          </div>
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight text-slate-100">Smart Intelligence</h1>
-            <p className="text-xs text-slate-500">
-              Powered by your store data · Generated {data?.generatedAt ? new Date(data.generatedAt).toLocaleTimeString() : "just now"}
-            </p>
-          </div>
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight text-slate-100">Smart Intelligence</h1>
+          <p className="text-xs text-slate-500">
+            Powered by your store data · Generated {data?.generatedAt ? new Date(data.generatedAt).toLocaleTimeString() : "just now"}
+          </p>
         </div>
         <button
           onClick={load}

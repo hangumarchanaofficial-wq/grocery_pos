@@ -4,14 +4,14 @@
 
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Modal from '@/components/ui/Modal';
 import Badge from '@/components/ui/Badge';
-import { Plus, Search, User, Phone, ShoppingBag, Users } from 'lucide-react';
+import { Plus, Search, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
@@ -22,6 +22,8 @@ interface Customer {
   email: string | null;
   _count: { bills: number };
 }
+
+const PAGE_SIZE = 10;
 
 interface CustomerDetails {
   name: string;
@@ -48,12 +50,15 @@ export default function CustomersPage() {
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerDetails | null>(null);
   const [form, setForm] = useState({ name: '', phone: '', email: '', address: '' });
   const [saving, setSaving] = useState(false);
+  const [tablePage, setTablePage] = useState(0);
 
   const loadCustomers = useCallback(async () => {
     setLoading(true);
     try {
-      const q = search ? `?search=${encodeURIComponent(search)}` : '';
-      const res = await apiFetch(`/api/customers${q}`);
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      params.set('limit', '500');
+      const res = await apiFetch(`/api/customers?${params}`);
       const data = await res.json();
       setCustomers(Array.isArray(data) ? data : []);
     } catch { /* ignore */ }
@@ -61,6 +66,16 @@ export default function CustomersPage() {
   }, [apiFetch, search]);
 
   useEffect(() => { loadCustomers(); }, [loadCustomers]);
+
+  const maxPage = Math.max(0, Math.ceil(customers.length / PAGE_SIZE) - 1);
+  const totalPages = Math.max(1, Math.ceil(customers.length / PAGE_SIZE));
+  const activePage = Math.min(tablePage, maxPage);
+  const pageRows = useMemo(() => {
+    const start = activePage * PAGE_SIZE;
+    return customers.slice(start, start + PAGE_SIZE);
+  }, [customers, activePage]);
+  const rangeStart = customers.length === 0 ? 0 : activePage * PAGE_SIZE + 1;
+  const rangeEnd = Math.min((activePage + 1) * PAGE_SIZE, customers.length);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,47 +138,99 @@ export default function CustomersPage() {
       <Input
         placeholder="Search by name or phone number..."
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setTablePage(0);
+        }}
         icon={<Search size={18} />}
       />
 
-      {/* Customer Grid */}
+      {/* Customer table — 10 per page; search still loads filtered list from API */}
       {loading ? (
         <div className="py-12 text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-brand-400/30 border-t-brand-400" />
         </div>
+      ) : customers.length === 0 ? (
+        <div className="flex h-40 items-center justify-center rounded-[20px] border border-dashed border-white/10 text-slate-500">
+          No customers found
+        </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {customers.map((customer) => (
-            <Card
-              key={customer.id}
-              className="cursor-pointer transition-all hover:border-brand-400/20 hover:bg-white/[0.04]"
-              onClick={() => viewCustomer(customer.id)}
-            >
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-white/8 bg-white/[0.05]">
-                  <User size={20} className="text-brand-300" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h4 className="font-semibold text-slate-100">{customer.name}</h4>
-                  <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-400">
-                    <Phone size={12} /> {customer.phone}
-                  </p>
-                  <div className="mt-3 flex items-center gap-2">
-                    <Badge variant="info">
-                      <ShoppingBag size={10} className="mr-1" />
-                      {customer._count.bills} purchases
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-          {customers.length === 0 && (
-            <div className="col-span-full flex h-40 items-center justify-center rounded-[28px] border border-dashed border-white/10 text-slate-500">
-              No customers found
+        <div className="overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.015] backdrop-blur-sm">
+          <div className="overflow-x-auto [-webkit-overflow-scrolling:touch]">
+            <table className="w-full table-fixed border-collapse text-left text-sm">
+              <thead>
+                <tr className="border-b border-white/[0.06] text-left">
+                  <th className="w-[45%] px-3 py-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:px-4">
+                    Name
+                  </th>
+                  <th className="w-[35%] px-3 py-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:px-4">
+                    Phone
+                  </th>
+                  <th className="w-[20%] px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:px-4">
+                    Purchases
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/[0.04]">
+                {pageRows.map((customer) => (
+                  <tr
+                    key={customer.id}
+                    className="cursor-pointer transition-colors hover:bg-white/[0.04]"
+                    onClick={() => viewCustomer(customer.id)}
+                  >
+                    <td className="min-w-0 px-3 py-3 font-semibold text-slate-100 sm:px-4">
+                      <span className="line-clamp-2">{customer.name}</span>
+                    </td>
+                    <td className="min-w-0 px-3 py-3 text-slate-400 sm:px-4">
+                      <span className="tabular-nums">{customer.phone}</span>
+                    </td>
+                    <td className="px-3 py-3 text-right tabular-nums text-slate-300 sm:px-4">
+                      {customer._count.bills}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex flex-col gap-2 border-t border-white/[0.06] px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-3">
+            <p className="text-center text-[11px] text-slate-500 sm:text-left">
+              <span className="tabular-nums text-slate-400">{rangeStart}</span>
+              {'–'}
+              <span className="tabular-nums text-slate-400">{rangeEnd}</span>
+              <span className="text-slate-600"> of </span>
+              <span className="tabular-nums text-slate-400">{customers.length}</span>
+            </p>
+            <div className="flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setTablePage((p) => Math.max(0, p - 1));
+                }}
+                disabled={activePage <= 0}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-slate-300 transition-all hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-35"
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <span className="min-w-[3.5rem] text-center text-[11px] tabular-nums text-slate-500">
+                {activePage + 1}/{totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setTablePage((p) => Math.min(maxPage, p + 1));
+                }}
+                disabled={activePage >= maxPage}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-slate-300 transition-all hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-35"
+                aria-label="Next page"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
             </div>
-          )}
+          </div>
         </div>
       )}
 
@@ -190,35 +257,51 @@ export default function CustomersPage() {
       >
         {selectedCustomer && (
           <div className="space-y-5">
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-4 text-center">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Total Spent</p>
-                <p className="mt-2 text-lg font-semibold text-brand-300">
-                  {formatCurrency(selectedCustomer.stats.totalSpent)}
-                </p>
-              </div>
-              <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-4 text-center">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Visits</p>
-                <p className="mt-2 text-lg font-semibold text-slate-100">
-                  {selectedCustomer.stats.visitCount}
-                </p>
-              </div>
-              <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-4 text-center">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Avg Bill</p>
-                <p className="mt-2 text-lg font-semibold text-slate-100">
-                  {selectedCustomer.stats.visitCount > 0
-                    ? formatCurrency(selectedCustomer.stats.totalSpent / selectedCustomer.stats.visitCount)
-                    : 'Rs 0'}
-                </p>
-              </div>
+            {/* Stats — shared layout so labels/values line up across cards */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-3">
+              {[
+                {
+                  label: 'Total spent',
+                  value: formatCurrency(selectedCustomer.stats.totalSpent),
+                  valueClass: 'text-brand-300',
+                },
+                {
+                  label: 'Visits',
+                  value: String(selectedCustomer.stats.visitCount),
+                  valueClass: 'text-slate-100',
+                },
+                {
+                  label: 'Avg bill',
+                  value:
+                    selectedCustomer.stats.visitCount > 0
+                      ? formatCurrency(
+                          selectedCustomer.stats.totalSpent / selectedCustomer.stats.visitCount
+                        )
+                      : formatCurrency(0),
+                  valueClass: 'text-brand-300',
+                },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  className="flex min-h-[5.75rem] flex-col items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-3 py-4 text-center sm:min-h-[6rem] sm:px-4"
+                >
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    {stat.label}
+                  </p>
+                  <p
+                    className={`text-lg font-semibold tabular-nums leading-none ${stat.valueClass}`}
+                  >
+                    {stat.value}
+                  </p>
+                </div>
+              ))}
             </div>
 
             {/* Favorite Products */}
             {selectedCustomer.stats.favoriteProducts.length > 0 && (
               <div>
-                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                  Favorite Products
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  Favorite products
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {selectedCustomer.stats.favoriteProducts.map((product) => (
@@ -228,23 +311,35 @@ export default function CustomersPage() {
               </div>
             )}
 
-            {/* Recent Purchases */}
+            {/* Recent purchases */}
             <div>
-              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Recent Purchases
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                Recent purchases
               </p>
-              <div className="max-h-52 space-y-2 overflow-y-auto pr-1">
-                {selectedCustomer.bills.slice(0, 10).map((bill) => (
-                  <div
-                    key={bill.billNumber}
-                    className="flex justify-between rounded-[18px] border border-white/6 bg-white/[0.02] px-4 py-3 text-sm"
-                  >
-                    <span className="font-mono font-medium text-slate-200">{bill.billNumber}</span>
-                    <span className="font-medium text-brand-300">{formatCurrency(bill.total)}</span>
-                    <span className="text-slate-500">{new Date(bill.createdAt).toLocaleDateString()}</span>
-                  </div>
-                ))}
-              </div>
+              {selectedCustomer.bills.length === 0 ? (
+                <p className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-6 text-center text-sm text-slate-500">
+                  No purchases yet
+                </p>
+              ) : (
+                <div className="max-h-52 space-y-2 overflow-y-auto pr-1">
+                  {selectedCustomer.bills.slice(0, 10).map((bill) => (
+                    <div
+                      key={bill.billNumber}
+                      className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-sm"
+                    >
+                      <span className="min-w-0 truncate font-mono font-medium text-slate-200">
+                        {bill.billNumber}
+                      </span>
+                      <span className="shrink-0 text-right font-medium tabular-nums text-brand-300">
+                        {formatCurrency(bill.total)}
+                      </span>
+                      <span className="shrink-0 text-right text-slate-500 tabular-nums">
+                        {new Date(bill.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}

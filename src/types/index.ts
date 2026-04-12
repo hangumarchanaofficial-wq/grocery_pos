@@ -19,6 +19,9 @@ export interface CartItem {
     productId: string;
     name: string;
     productCode?: string;
+    /** Display label for search / cart cards (e.g. FRUITS → Fruits) */
+    category?: string;
+    unit?: string;
     price: number;
     costPrice: number;
     quantity: number;

@@ -89,7 +89,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       {cards.map((card) => (
         <div
           key={card.label}
-          className="premium-card group rounded-[16px] sm:rounded-[20px] p-4 sm:p-5"
+          className="premium-card group flex flex-col items-center text-center sm:items-start sm:text-left rounded-[16px] sm:rounded-[20px] p-4 sm:p-5"
         >
           {/* Top glow line */}
           <div className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r ${card.topLine}`} />
@@ -98,22 +98,22 @@ export default function StatsCards({ stats }: StatsCardsProps) {
           <div className={`pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full ${card.glowColor} blur-[40px] opacity-60 transition-opacity duration-500 group-hover:opacity-100`} />
 
           {/* Icon */}
-          <div className={`relative mb-3 sm:mb-4 inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl ${card.iconBg} transition-transform duration-300 group-hover:scale-110`}>
+          <div className={`relative mb-3 sm:mb-4 flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl ${card.iconBg} transition-transform duration-300 group-hover:scale-110`}>
             <card.icon size={16} className={`${card.iconColor} sm:[&]:w-[18px] sm:[&]:h-[18px]`} />
           </div>
 
           {/* Value */}
-          <p className="relative text-[18px] sm:text-[24px] lg:text-[26px] font-semibold leading-none tracking-[-0.04em] text-slate-50">
+          <p className="relative w-full text-[18px] sm:text-[24px] lg:text-[26px] font-semibold leading-none tracking-[-0.04em] text-slate-50 tabular-nums">
             {card.value}
           </p>
 
           {/* Label */}
-          <p className="relative mt-2 sm:mt-2.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+          <p className="relative mt-2 sm:mt-2.5 w-full text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
             {card.label}
           </p>
 
           {/* Sub */}
-          <p className="relative mt-0.5 text-[10px] sm:text-[11px] text-slate-600">
+          <p className="relative mt-0.5 w-full text-[10px] sm:text-[11px] text-slate-600">
             {card.sub}
           </p>
         </div>
