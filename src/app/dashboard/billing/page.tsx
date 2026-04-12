@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRef, useState } from 'react';
 import ProductSearch from '@/components/billing/ProductSearch';
@@ -51,10 +51,10 @@ export default function BillingPage() {
         setCustomer(data[0].id, data[0].name);
         toast.success(`${tr('customer')}: ${data[0].name}`);
       } else {
-        toast.error(lang === 'si' ? 'Customer not found' : 'Customer not found');
+        toast.error('Customer not found');
       }
     } catch {
-      toast.error(lang === 'si' ? 'Lookup failed' : 'Lookup failed');
+      toast.error('Lookup failed');
     }
   };
 
@@ -63,97 +63,100 @@ export default function BillingPage() {
       const bill = await submitBill(method, paidAmount, discount);
       setLastBill(bill);
       toast.success(`Bill ${bill.billNumber} created!`);
-      setTimeout(() => {
-        window.print();
-      }, 400);
+      setTimeout(() => { window.print(); }, 400);
     } catch (error: unknown) {
       toast.error((error as Error).message);
       throw error;
     }
   };
 
-  const handlePrint = () => {
-    if (lastBill) window.print();
-  };
+  const handlePrint = () => { if (lastBill) window.print(); };
 
   const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
-  const cartTotals = calculateBillTotals({
-    subtotal,
-    taxRatePercent: settings.taxRate,
-  });
+  const cartTotals = calculateBillTotals({ subtotal, taxRatePercent: settings.taxRate });
 
   return (
-    <div className="space-y-5">
-      <div className="relative overflow-hidden rounded-[24px] border border-white/[0.07] bg-gradient-to-br from-[rgba(8,20,40,0.96)] to-[rgba(4,10,22,0.98)] p-7 shadow-[0_32px_80px_rgba(0,0,0,0.4)]">
+    <div className="space-y-3 sm:space-y-4">
+
+      {/* ── HERO BANNER ── */}
+      <div className="premium-card animate-fade-up rounded-[18px] sm:rounded-[24px] p-4 sm:p-7">
         <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-emerald-500/[0.06] blur-[80px]" />
         <div className="pointer-events-none absolute -right-10 bottom-0 h-48 w-48 rounded-full bg-sky-500/[0.04] blur-[60px]" />
-        <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" />
-        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" />
+
+        <div className="relative flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <div className="mb-3 flex items-center gap-2">
+            <div className="mb-2 sm:mb-3 flex items-center gap-2">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-400">
-                Register Workspace
-              </span>
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-400">Register Workspace</span>
             </div>
-            <h1 className="text-[clamp(1.8rem,3.5vw,2.5rem)] font-semibold leading-[1.1] tracking-[-0.04em] text-white">
-              Fast billing,
-              <br />
-              <span className="bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
-                barcode-first.
-              </span>
+            <h1 className="text-[clamp(1.3rem,3.5vw,2.5rem)] font-semibold leading-[1.1] tracking-[-0.04em] text-white">
+              Fast billing,<br />
+              <span className="bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">barcode-first.</span>
             </h1>
           </div>
-          <div className="grid grid-cols-3 gap-3 lg:w-[420px]">
+
+          {/* Feature tiles */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:w-[420px]">
             {[
-              { icon: <ScanLine size={15} className="text-emerald-400" />, bg: 'bg-emerald-500/10', border: 'border-emerald-400/20', label: 'Scanner', sub: 'Barcode + manual fallback' },
-              { icon: <WalletCards size={15} className="text-sky-400" />, bg: 'bg-sky-500/10', border: 'border-sky-400/20', label: 'Payments', sub: 'Cash, card, QR + discounts' },
-              { icon: <Zap size={15} className="text-violet-400" />, bg: 'bg-violet-500/10', border: 'border-violet-400/20', label: 'Express', sub: 'One-click fast checkout' },
+              { icon: ScanLine, color: 'emerald', label: 'Scanner', sub: 'Barcode + manual' },
+              { icon: WalletCards, color: 'sky', label: 'Payments', sub: 'Cash, card, QR' },
+              { icon: Zap, color: 'violet', label: 'Express', sub: 'One-click checkout' },
             ].map((tile) => (
-              <div key={tile.label} className={`rounded-[16px] border ${tile.border} ${tile.bg} p-4`}>
-                <div className={`mb-3 flex h-8 w-8 items-center justify-center rounded-[10px] ${tile.bg}`}>{tile.icon}</div>
-                <p className="text-[11px] font-semibold text-slate-200">{tile.label}</p>
-                <p className="mt-0.5 text-[10px] leading-relaxed text-slate-600">{tile.sub}</p>
+              <div key={tile.label} className={`rounded-[12px] sm:rounded-[16px] border border-${tile.color}-400/20 bg-${tile.color}-500/10 p-2.5 sm:p-4 transition-all duration-300 hover:bg-${tile.color}-500/[0.15]`}>
+                <div className={`mb-1.5 sm:mb-3 flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-[8px] sm:rounded-[10px] bg-${tile.color}-500/10`}>
+                  <tile.icon size={13} className={`text-${tile.color}-400 sm:[&]:w-[15px] sm:[&]:h-[15px]`} />
+                </div>
+                <p className="text-[10px] sm:text-[11px] font-semibold text-slate-200">{tile.label}</p>
+                <p className="mt-0.5 text-[9px] sm:text-[10px] leading-relaxed text-slate-600 hidden sm:block">{tile.sub}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="space-y-5">
-        <div className="space-y-4">
-          <div className="relative overflow-visible rounded-[24px] border border-white/[0.07] bg-gradient-to-br from-[rgba(6,14,30,0.96)] to-[rgba(3,8,18,0.98)] p-6 shadow-[0_32px_80px_rgba(0,0,0,0.3)]">
-            <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/25 to-transparent" />
-            <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-sky-400/20 bg-sky-500/10">
-                <Search size={17} className="text-sky-400" />
+      {/* ── MAIN POS AREA — stacks on mobile, side-by-side on desktop ── */}
+      <div className="grid gap-3 sm:gap-4 xl:grid-cols-[1fr_420px]">
+
+        {/* LEFT COLUMN — Search + Customer */}
+        <div className="space-y-3 sm:space-y-4">
+
+          {/* Product Search */}
+          <div className="premium-card animate-fade-up rounded-[16px] sm:rounded-[24px] p-3.5 sm:p-6" style={{ animationDelay: '0.05s' }}>
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/25 to-transparent" />
+            <div className="relative mb-3 sm:mb-5 flex items-center gap-2.5 sm:gap-3">
+              <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-[10px] sm:rounded-[14px] border border-sky-400/20 bg-sky-500/10 shadow-[0_6px_20px_rgba(56,189,248,0.1)]">
+                <Search size={14} className="text-sky-400 sm:[&]:w-[17px] sm:[&]:h-[17px]" />
               </div>
               <div>
-                <h2 className="text-[15px] font-semibold tracking-[-0.02em] text-slate-100">Product Lookup</h2>
-                <p className="text-[11px] text-slate-500">Search by name or scan barcode for rapid entry</p>
+                <h2 className="text-[13px] sm:text-[15px] font-semibold tracking-[-0.02em] text-slate-100">Product Lookup</h2>
+                <p className="text-[9px] sm:text-[11px] text-slate-500">Search or scan barcode</p>
               </div>
             </div>
-            <ProductSearch />
+            <div className="relative">
+              <ProductSearch />
+            </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[24px] border border-white/[0.07] bg-gradient-to-br from-[rgba(6,14,30,0.96)] to-[rgba(3,8,18,0.98)] p-6 shadow-[0_32px_80px_rgba(0,0,0,0.3)]">
-            <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/20 to-transparent" />
-            <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-violet-400/20 bg-violet-500/10">
-                <UserPlus size={17} className="text-violet-400" />
+          {/* Customer Attach */}
+          <div className="premium-card animate-fade-up rounded-[16px] sm:rounded-[24px] p-3.5 sm:p-6" style={{ animationDelay: '0.1s' }}>
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/20 to-transparent" />
+            <div className="relative mb-3 sm:mb-5 flex items-center gap-2.5 sm:gap-3">
+              <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-[10px] sm:rounded-[14px] border border-violet-400/20 bg-violet-500/10 shadow-[0_6px_20px_rgba(139,92,246,0.1)]">
+                <UserPlus size={14} className="text-violet-400 sm:[&]:w-[17px] sm:[&]:h-[17px]" />
               </div>
               <div>
-                <h2 className="text-[15px] font-semibold tracking-[-0.02em] text-slate-100">{tr('customer')}</h2>
-                <p className="text-[11px] text-slate-500">Attach a customer to this transaction by phone</p>
+                <h2 className="text-[13px] sm:text-[15px] font-semibold tracking-[-0.02em] text-slate-100">{tr('customer')}</h2>
+                <p className="text-[9px] sm:text-[11px] text-slate-500">Attach by phone number</p>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="relative flex gap-2 sm:gap-3">
               <div className="flex-1">
                 <Input
-                  placeholder="Enter phone number..."
+                  placeholder="Phone number..."
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleCustomerLookup()}
@@ -161,111 +164,120 @@ export default function BillingPage() {
               </div>
               <button
                 onClick={handleCustomerLookup}
-                className="flex items-center gap-2 rounded-[14px] border border-violet-400/20 bg-violet-500/10 px-5 py-2.5 text-[13px] font-semibold text-violet-300 transition-all hover:bg-violet-500/20"
+                className="flex items-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-[14px] border border-violet-400/20 bg-violet-500/10 px-3 sm:px-5 py-2.5 text-[12px] sm:text-[13px] font-semibold text-violet-300 transition-all hover:bg-violet-500/20 active:scale-[0.97]"
               >
-                <User size={14} /> Find
+                <User size={13} /> <span className="hidden sm:inline">Find</span>
               </button>
             </div>
             {customerName && (
-              <div className="mt-3 flex items-center gap-2 rounded-[14px] border border-emerald-400/20 bg-emerald-500/10 px-4 py-2.5">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-[10px] font-bold text-emerald-400">
+              <div className="relative mt-2.5 sm:mt-3 flex items-center gap-2 rounded-xl sm:rounded-[14px] border border-emerald-400/20 bg-emerald-500/10 px-3 sm:px-4 py-2 sm:py-2.5">
+                <div className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-emerald-500/20 text-[9px] sm:text-[10px] font-bold text-emerald-400">
                   {customerName[0].toUpperCase()}
                 </div>
-                <p className="text-[13px] font-semibold text-emerald-300">{customerName}</p>
-                <span className="ml-auto text-[10px] uppercase tracking-[0.15em] text-emerald-500">Linked</span>
+                <p className="text-[12px] sm:text-[13px] font-semibold text-emerald-300">{customerName}</p>
+                <span className="ml-auto text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-emerald-500">Linked</span>
               </div>
             )}
           </div>
+
+          {/* Last Receipt — only shows after a bill */}
+          {lastBill && (
+            <div className="premium-card animate-fade-up rounded-[16px] sm:rounded-[24px] p-3.5 sm:p-6">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/20 to-transparent" />
+              <div className="relative mb-3 sm:mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-[10px] sm:rounded-[14px] border border-amber-400/20 bg-amber-500/10">
+                    <ReceiptIcon size={14} className="text-amber-400 sm:[&]:w-[17px] sm:[&]:h-[17px]" />
+                  </div>
+                  <div>
+                    <h2 className="text-[13px] sm:text-[15px] font-semibold tracking-[-0.02em] text-slate-100">Last Receipt</h2>
+                    <p className="text-[9px] sm:text-[11px] text-slate-500">Preview before printing</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handlePrint}
+                  className="flex items-center gap-1.5 rounded-[10px] sm:rounded-[12px] border border-white/[0.08] bg-white/[0.04] px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-[12px] font-semibold text-slate-300 transition-all hover:bg-white/[0.08] hover:text-white active:scale-[0.97]"
+                >
+                  <Printer size={12} /> Print
+                </button>
+              </div>
+              <div className="relative max-h-[400px] sm:max-h-[520px] overflow-y-auto rounded-[14px] sm:rounded-[18px] border border-white/[0.05] bg-white p-1.5 sm:p-2">
+                <Receipt ref={receiptRef} bill={lastBill} />
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="relative overflow-visible rounded-[24px] border border-white/[0.07] bg-gradient-to-br from-[rgba(6,14,30,0.96)] to-[rgba(3,8,18,0.98)] shadow-[0_32px_80px_rgba(0,0,0,0.3)]">
-          <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
-          <div className="flex items-center justify-between border-b border-white/[0.05] px-6 py-5">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-emerald-400/20 bg-emerald-500/10">
-                <ShoppingBag size={17} className="text-emerald-400" />
+        {/* RIGHT COLUMN — Cart + Payment */}
+        <div className="premium-card animate-fade-up rounded-[16px] sm:rounded-[24px] xl:sticky xl:top-20 xl:self-start" style={{ animationDelay: '0.15s' }}>
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
+
+          {/* Cart Header */}
+          <div className="relative flex items-center justify-between border-b border-white/[0.05] px-4 sm:px-6 py-3.5 sm:py-5">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-[10px] sm:rounded-[14px] border border-emerald-400/20 bg-emerald-500/10 shadow-[0_6px_20px_rgba(34,197,94,0.1)]">
+                <ShoppingBag size={14} className="text-emerald-400 sm:[&]:w-[17px] sm:[&]:h-[17px]" />
               </div>
               <div>
-                <h2 className="text-[15px] font-semibold tracking-[-0.02em] text-slate-100">Current Cart</h2>
-                <p className="text-[11px] text-slate-500">{items.length} line items staged</p>
+                <h2 className="text-[13px] sm:text-[15px] font-semibold tracking-[-0.02em] text-slate-100">Current Cart</h2>
+                <p className="text-[9px] sm:text-[11px] text-slate-500">{items.length} line items</p>
               </div>
             </div>
             {items.length > 0 && (
-              <div className="rounded-[10px] bg-emerald-500/15 px-3 py-1.5 text-[11px] font-bold text-emerald-400">
+              <div className="rounded-full bg-emerald-500/15 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-[11px] font-bold text-emerald-400 ring-1 ring-emerald-400/20">
                 {formatCurrency(subtotal)}
               </div>
             )}
           </div>
 
-          <div className="px-4 py-3">{items.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-[20px] border border-white/[0.05] bg-white/[0.02]">
-                <Package size={28} className="text-slate-600" />
+          {/* Cart Body */}
+          <div className="relative px-3 sm:px-4 py-3">
+            {items.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-3 py-10 sm:py-14 text-center">
+                <div className="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-[16px] sm:rounded-[20px] border border-white/[0.05] bg-white/[0.02]">
+                  <Package size={24} className="text-slate-600 sm:[&]:w-[28px] sm:[&]:h-[28px]" />
+                </div>
+                <div>
+                  <p className="text-[13px] sm:text-[14px] font-semibold text-slate-400">Cart is empty</p>
+                  <p className="mt-0.5 text-[11px] sm:text-[12px] text-slate-600">Search or scan products to begin</p>
+                </div>
               </div>
-              <div>
-                <p className="text-[14px] font-semibold text-slate-400">Cart is empty</p>
-                <p className="mt-1 text-[12px] text-slate-600">Search or scan products to begin a transaction</p>
-              </div>
-            </div>
-          ) : <Cart />}</div>
+            ) : (
+              <Cart />
+            )}
+          </div>
 
+          {/* Cart Footer — Totals + Pay Button */}
           {items.length > 0 && (
-            <div className="border-t border-white/[0.05] p-5">
-              <div className="mb-4 space-y-2 rounded-[16px] border border-white/[0.05] bg-white/[0.02] p-4">
-                <div className="flex items-center justify-between text-[12px]">
+            <div className="relative border-t border-white/[0.05] p-3.5 sm:p-5">
+              <div className="mb-3 sm:mb-4 space-y-1.5 sm:space-y-2 rounded-[12px] sm:rounded-[16px] border border-white/[0.05] bg-white/[0.02] p-3 sm:p-4">
+                <div className="flex items-center justify-between text-[11px] sm:text-[12px]">
                   <span className="text-slate-500">{tr('subtotal')}</span>
                   <span className="font-medium text-slate-300">{formatCurrency(subtotal)}</span>
                 </div>
                 {settings.taxRate > 0 && (
-                  <div className="flex items-center justify-between text-[12px]">
+                  <div className="flex items-center justify-between text-[11px] sm:text-[12px]">
                     <span className="text-slate-500">{tr('tax')} ({settings.taxRate}%)</span>
                     <span className="font-medium text-slate-300">{formatCurrency(cartTotals.tax)}</span>
                   </div>
                 )}
-                <div className="my-2 border-t border-white/[0.06]" />
+                <div className="my-1.5 sm:my-2 border-t border-white/[0.06]" />
                 <div className="flex items-center justify-between">
-                  <span className="text-[13px] font-semibold text-slate-200">Total</span>
-                  <span className="text-[15px] font-bold text-emerald-400">
-                    {formatCurrency(cartTotals.total)}
-                  </span>
+                  <span className="text-[12px] sm:text-[13px] font-semibold text-slate-200">Total</span>
+                  <span className="text-[14px] sm:text-[15px] font-bold text-emerald-400">{formatCurrency(cartTotals.total)}</span>
                 </div>
               </div>
               <button
                 onClick={() => setPaymentOpen(true)}
-                className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-emerald-500 py-3.5 text-[14px] font-semibold text-slate-950 shadow-[0_8px_32px_rgba(34,197,94,0.3)] transition-all hover:bg-emerald-400 active:scale-[0.98]"
+                className="flex w-full items-center justify-center gap-2 rounded-[12px] sm:rounded-[16px] bg-emerald-500 py-3 sm:py-3.5 text-[13px] sm:text-[14px] font-semibold text-slate-950 shadow-[0_8px_32px_rgba(34,197,94,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_12px_40px_rgba(34,197,94,0.4)] active:scale-[0.97]"
               >
-                <CreditCard size={17} />
+                <CreditCard size={16} />
                 Proceed to Payment
               </button>
             </div>
           )}
         </div>
 
-        {lastBill && (
-          <div className="relative overflow-hidden rounded-[24px] border border-white/[0.07] bg-gradient-to-br from-[rgba(6,14,30,0.96)] to-[rgba(3,8,18,0.98)] p-6 shadow-[0_32px_80px_rgba(0,0,0,0.3)]">
-            <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/20 to-transparent" />
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-amber-400/20 bg-amber-500/10">
-                  <ReceiptIcon size={17} className="text-amber-400" />
-                </div>
-                <div>
-                  <h2 className="text-[15px] font-semibold tracking-[-0.02em] text-slate-100">Last Receipt</h2>
-                  <p className="text-[11px] text-slate-500">Preview before printing</p>
-                </div>
-              </div>
-              <button
-                onClick={handlePrint}
-                className="flex items-center gap-2 rounded-[12px] border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[12px] font-semibold text-slate-300 transition-all hover:bg-white/[0.08] hover:text-white"
-              >
-                <Printer size={13} /> Print
-              </button>
-            </div>
-            <div className="max-h-[520px] overflow-y-auto rounded-[18px] border border-white/[0.05] bg-white p-2">
-              <Receipt ref={receiptRef} bill={lastBill} />
-            </div>
-          </div>
-        )}
       </div>
 
       <PaymentModal open={paymentOpen} onClose={() => setPaymentOpen(false)} onSubmit={handlePayment} />
