@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Heart, ShieldCheck, Cpu, Github, Mail, Globe } from 'lucide-react';
 
@@ -6,13 +6,13 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-auto border-t border-white/[0.06]">
+    <footer className="relative mt-auto border-t border-white/[0.06] hidden sm:block">
       {/* Subtle glow line at top */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Main footer content */}
-        <div className="grid grid-cols-1 gap-8 py-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-8 py-10 lg:grid-cols-4">
 
           {/* Brand */}
           <div className="space-y-3">

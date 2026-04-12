@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -28,7 +28,6 @@ export default function SalesChart({ data: initialData }: SalesChartProps) {
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setOpen(false);
@@ -68,18 +67,18 @@ export default function SalesChart({ data: initialData }: SalesChartProps) {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-[24px] border border-white/[0.07] bg-gradient-to-br from-[rgba(6,14,30,0.96)] to-[rgba(3,8,18,0.98)] p-6 shadow-[0_32px_80px_rgba(0,0,0,0.35)]">
+    <div className="relative overflow-hidden rounded-[20px] sm:rounded-[24px] border border-white/[0.07] bg-gradient-to-br from-[rgba(6,14,30,0.96)] to-[rgba(3,8,18,0.98)] p-4 sm:p-6 shadow-[0_32px_80px_rgba(0,0,0,0.35)]">
       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
 
       {/* Header */}
-      <div className="mb-6 flex items-start justify-between gap-4">
+      <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-emerald-400/20 bg-emerald-500/10">
-            <BarChart3 size={18} className="text-emerald-400" />
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-[12px] sm:rounded-[14px] border border-emerald-400/20 bg-emerald-500/10">
+            <BarChart3 size={16} className="text-emerald-400 sm:[&]:w-[18px] sm:[&]:h-[18px]" />
           </div>
           <div>
-            <h3 className="text-[15px] font-semibold tracking-[-0.02em] text-slate-100">Sales Overview</h3>
-            <p className="text-[11px] text-slate-500">Revenue and profit velocity</p>
+            <h3 className="text-[14px] sm:text-[15px] font-semibold tracking-[-0.02em] text-slate-100">Sales Overview</h3>
+            <p className="text-[10px] sm:text-[11px] text-slate-500">Revenue and profit velocity</p>
           </div>
         </div>
 
@@ -87,9 +86,9 @@ export default function SalesChart({ data: initialData }: SalesChartProps) {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setOpen(o => !o)}
-            className="flex items-center gap-2 rounded-[12px] border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[12px] font-semibold text-slate-200 transition-all hover:border-white/[0.13] hover:bg-white/[0.07]"
+            className="flex items-center gap-2 rounded-[12px] border border-white/[0.08] bg-white/[0.04] px-3 sm:px-4 py-2 text-[11px] sm:text-[12px] font-semibold text-slate-200 transition-all hover:border-white/[0.13] hover:bg-white/[0.07]"
           >
-            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500 mr-1">Window</span>
+            <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500 mr-1">Window</span>
             {selected.label}
             <ChevronDown size={13} className={`text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
           </button>
@@ -115,14 +114,14 @@ export default function SalesChart({ data: initialData }: SalesChartProps) {
 
       {/* Chart */}
       {loading ? (
-        <div className="flex h-72 items-center justify-center text-slate-500 text-sm">
+        <div className="flex h-52 sm:h-72 items-center justify-center text-slate-500 text-sm">
           <div className="h-7 w-7 animate-spin rounded-full border-2 border-slate-600 border-t-emerald-400 mr-3" />
           Loading chart...
         </div>
       ) : (
-        <div className="h-72">
+        <div className="h-52 sm:h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <BarChart data={chartData} margin={{ top: 10, right: 5, left: -15, bottom: 0 }}>
               <defs>
                 <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#22c55e" stopOpacity={0.9} />
@@ -134,16 +133,16 @@ export default function SalesChart({ data: initialData }: SalesChartProps) {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.06)" vertical={false} />
-              <XAxis dataKey={chartData[0]?.label ? 'label' : 'date'} tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={v => `LKR ${(v/1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
+              <XAxis dataKey={chartData[0]?.label ? 'label' : 'date'} tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: '#64748b' }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} axisLine={false} tickLine={false} width={35} />
               <Tooltip
                 cursor={{ fill: 'rgba(255,255,255,0.025)' }}
                 contentStyle={{ borderRadius: '16px', border: '1px solid rgba(148,163,184,0.1)', background: 'rgba(8,16,32,0.97)', backdropFilter: 'blur(20px)', boxShadow: '0 32px 80px rgba(0,0,0,0.4)', color: '#e2e8f0', fontSize: '12px' }}
                 formatter={(v, name) => [fmt(v), name === 'totalSales' ? 'Sales' : 'Profit']}
               />
-              <Legend wrapperStyle={{ color: '#64748b', fontSize: '11px', paddingTop: '16px' }} formatter={v => v === 'totalSales' ? 'Sales' : 'Profit'} />
-              <Bar dataKey="totalSales" fill="url(#salesGrad)" radius={[6, 6, 0, 0]} />
-              <Bar dataKey="totalProfit" fill="url(#profitGrad)" radius={[6, 6, 0, 0]} />
+              <Legend wrapperStyle={{ color: '#64748b', fontSize: '10px', paddingTop: '12px' }} formatter={v => v === 'totalSales' ? 'Sales' : 'Profit'} />
+              <Bar dataKey="totalSales" fill="url(#salesGrad)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="totalProfit" fill="url(#profitGrad)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

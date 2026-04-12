@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { DollarSign, Receipt, TrendingUp, Package, AlertTriangle, Clock } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
@@ -67,29 +67,29 @@ export default function StatsCards({ stats }: StatsCardsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-4 xl:grid-cols-6">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-6">
       {cards.map((card) => (
         <div
           key={card.label}
-          className="relative overflow-hidden rounded-[20px] border border-white/[0.06] bg-white/[0.03] p-5 lg:p-6 backdrop-blur-sm transition-all duration-200 hover:border-white/[0.10] hover:bg-white/[0.05]"
+          className="relative overflow-hidden rounded-[16px] sm:rounded-[20px] border border-white/[0.06] bg-white/[0.03] p-4 sm:p-5 lg:p-6 backdrop-blur-sm transition-all duration-200 hover:border-white/[0.10] hover:bg-white/[0.05]"
         >
           {/* Icon */}
-          <div className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl ${card.iconBg}`}>
-            <card.icon size={20} className={card.iconColor} />
+          <div className={`mb-3 sm:mb-5 inline-flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-lg sm:rounded-xl ${card.iconBg}`}>
+            <card.icon size={17} className={`${card.iconColor} sm:[&]:w-5 sm:[&]:h-5`} />
           </div>
 
           {/* Value */}
-          <p className="text-[28px] font-semibold leading-none tracking-[-0.04em] text-slate-50">
+          <p className="text-[20px] sm:text-[28px] font-semibold leading-none tracking-[-0.04em] text-slate-50">
             {card.value}
           </p>
 
           {/* Label */}
-          <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+          <p className="mt-2 sm:mt-3 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
             {card.label}
           </p>
 
           {/* Sub */}
-          <p className="mt-1 text-xs text-slate-600">
+          <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-slate-600">
             {card.sub}
           </p>
         </div>

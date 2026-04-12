@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import Sidebar from '@/components/layout/Sidebar';
@@ -29,12 +29,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         )}
 
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col overflow-x-hidden">
           <TopBar onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
 
           <main className="flex-1">
             <div className="min-h-full flex flex-col">
-              <div className="flex-1 p-4 pb-24 sm:p-6 lg:p-8">
+              <div className="flex-1 p-3 pb-28 sm:p-4 sm:pb-24 lg:p-8">
                 {children}
               </div>
 
