@@ -87,6 +87,11 @@ export function useAuth() {
 
   const logout = useCallback(async () => {
     const supabase = createClient();
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch {
+      // Best effort: continue with client sign-out even if route fails.
+    }
     await supabase.auth.signOut();
     setUser(null);
   }, []);

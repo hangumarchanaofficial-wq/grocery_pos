@@ -1,15 +1,7 @@
-// src/components/billing/Receipt.tsx
-// ============================================================
-// Receipt — Exact format matching Samaranayake invoice style
-// Supports English & Sinhala, thermal 80mm print layout
-// ============================================================
-
 'use client';
 
 import { forwardRef } from 'react';
-import { formatCurrency } from '@/lib/utils';
 import { useSettingsStore } from '@/store/settingsStore';
-import { t } from '@/lib/i18n';
 import type { AppLanguage } from '@/store/settingsStore';
 
 export interface ReceiptBill {
@@ -27,7 +19,7 @@ export interface ReceiptBill {
   items: {
     quantity: number;
     price: number;
-    unitPrice?: number; // buying/cost price for savings display
+    unitPrice?: number;
     total: number;
     product: { name: string; productCode?: string };
   }[];
@@ -38,292 +30,248 @@ interface ReceiptProps {
   forceLang?: AppLanguage;
 }
 
-// Pad left helper for table alignment
-function padL(str: string, len: number): string {
-  return str.padStart(len, ' ');
+function amount(n: number): string {
+  return Number.isFinite(n) ? n.toFixed(2) : '0.00';
 }
-function padR(str: string, len: number): string {
-  return str.padEnd(len, ' ');
+
+function paymentLabel(method: string): string {
+  if (method === 'CASH') return 'CASH';
+  if (method === 'CARD' || method === 'VISA') return 'VISA';
+  if (method === 'QR') return 'QR PAY';
+  return method || 'PAYMENT';
+}
+
+function safeDate(input: string): Date {
+  const d = input ? new Date(input) : new Date();
+  return Number.isNaN(d.getTime()) ? new Date() : d;
 }
 
 const Receipt = forwardRef<HTMLDivElement, ReceiptProps>(({ bill, forceLang }, ref) => {
   const { settings } = useSettingsStore();
   const lang = forceLang ?? settings.language;
-  const tr = (key: Parameters<typeof t>[1]) => t(lang, key);
 
-  const storeNameLines =
-    lang === 'si'
-      ? settings.storeNameSi.split('\n')
-      : settings.storeName.split('\n');
+  const storeNameLines = (lang === 'si' ? settings.storeNameSi : settings.storeName)
+    .split('\n')
+    .filter(Boolean);
+  const created = safeDate(bill.createdAt);
+  const dateStr = created.toISOString().slice(0, 10);
+  const timeStr = created.toTimeString().slice(0, 8);
+  const endTime = `${timeStr}.0`;
 
-  const address = lang === 'si' ? settings.addressSi : settings.address;
-  const footer = lang === 'si' ? settings.receiptFooterSi : settings.receiptFooter;
-
-  // Format invoice number like: PA0112603300076
-  const invNo = bill.billNumber;
-
-  // Format date like: 2026-03-30   13:07:25.
-  const dateObj = bill.createdAt ? new Date(bill.createdAt) : new Date();
-  const validDate = Number.isNaN(dateObj.getTime()) ? new Date() : dateObj;
-  const dateStr = validDate.toISOString().slice(0, 10);
-  const timeStr = validDate.toTimeString().slice(0, 8) + '.';
-
-  // Total savings = sum of (unitPrice - price) * qty across items
-  const totalSavings = bill.items.reduce((acc, item) => {
-    if (item.unitPrice && item.unitPrice > item.price) {
-      return acc + (item.unitPrice - item.price) * item.quantity;
-    }
-    return acc;
+  const lineCount = bill.items.length;
+  const savings = bill.items.reduce((sum, item) => {
+    const refPrice = item.unitPrice ?? item.price;
+    const diff = refPrice - item.price;
+    return diff > 0 ? sum + diff * item.quantity : sum;
   }, 0);
 
-  const LINE = '─'.repeat(42);
-  const DLINE = '═'.repeat(42);
+  const paymentText = paymentLabel(bill.paymentMethod);
+  const paidValue = bill.paymentMethod === 'CASH' ? bill.paidAmount : bill.total;
+  const balanceValue = bill.paymentMethod === 'CASH' ? Math.max(0, bill.changeAmount) : 0;
 
   return (
-    <>
-      {/* ─── Print-only CSS injected inline ─── */}
+    <div ref={ref}>
       <style>{`
         .receipt-root {
           font-family: ${lang === 'si'
             ? "var(--font-sinhala), 'Iskoola Pota', monospace"
-            : "'Courier New', 'Courier', monospace"};
-          font-size: 12px;
-          line-height: 1.5;
-          color: #000;
-          background: #fff;
-          width: 302px; /* 80mm thermal */
+            : "'Courier New', Courier, monospace"};
+          width: 300px;
           margin: 0 auto;
-          padding: 8px 6px;
+          padding: 6px 6px;
+          background: #fff;
+          color: #000;
+          font-size: 11px;
+          line-height: 1.2;
+          page-break-inside: avoid;
+          break-inside: avoid;
         }
-        .receipt-center { text-align: center; }
-        .receipt-bold   { font-weight: 700; }
-        .receipt-large  { font-size: 15px; }
-        .receipt-xlarge { font-size: 18px; }
-        .receipt-row    { display: flex; justify-content: space-between; }
-        .receipt-divider{ border-top: 1px dashed #000; margin: 4px 0; }
-        .receipt-divider-solid { border-top: 1px solid #000; margin: 4px 0; }
-        .receipt-item-name { font-weight: 700; font-size: 11px; }
-        .receipt-table-header {
+        .r-center { text-align: center; }
+        .r-bold { font-weight: 700; }
+        .r-row { display: flex; justify-content: space-between; gap: 8px; }
+        .r-divider { border-top: 1px solid #111; margin: 4px 0; }
+        .r-meta { margin-top: 6px; }
+        .r-meta .r-row { margin: 1px 0; }
+        .r-col-head {
           display: grid;
-          grid-template-columns: 55px 1fr 60px 55px 60px;
+          grid-template-columns: 56px 1fr 58px 58px 64px;
+          font-size: 9px;
           font-weight: 700;
+          border-top: 1px solid #111;
+          border-bottom: 1px solid #111;
+          padding: 2px 0;
+          margin: 4px 0 2px;
+        }
+        .r-item-name {
           font-size: 10px;
-          border-bottom: 1px solid #000;
-          padding-bottom: 2px;
-          margin-bottom: 2px;
-        }
-        .receipt-table-row {
-          display: grid;
-          grid-template-columns: 55px 1fr 60px 55px 60px;
-          font-size: 11px;
-          align-items: start;
-        }
-        .receipt-table-row-item {
-          grid-column: 1 / -1;
           font-weight: 700;
-          font-size: 11px;
-          padding-bottom: 1px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
-        .receipt-table-values {
+        .r-item-values {
           display: grid;
-          grid-template-columns: 55px 60px 55px 60px;
-          font-size: 11px;
-          padding-left: 55px;
-          gap: 0;
+          grid-template-columns: 28px 1fr 58px 58px 64px;
+          align-items: baseline;
+          font-size: 10px;
+          margin: 0 0 1px;
         }
-        .receipt-right  { text-align: right; }
-        .receipt-savings {
-          text-align: center;
-          font-size: 13px;
+        .r-right { text-align: right; }
+        .r-total {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          font-size: 12px;
           font-weight: 700;
           margin: 4px 0;
-          border: 1px solid #000;
-          padding: 4px;
         }
+        .r-balance {
+          font-size: 22px;
+          font-weight: 700;
+          line-height: 1;
+        }
+        .r-saving-title {
+          font-size: 11px;
+          font-weight: 700;
+          text-align: center;
+          margin-top: 4px;
+        }
+        .r-saving-amount {
+          font-size: 28px;
+          font-weight: 800;
+          text-align: center;
+          line-height: 1;
+          margin-top: 1px;
+        }
+        .r-footnote { text-align: center; font-size: 11px; margin-top: 8px; }
+        .r-software { text-align: center; color: #555; font-size: 9px; margin-top: 8px; }
+
         @media print {
           @page { margin: 0; size: 80mm auto; }
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 80mm !important;
+            background: #fff !important;
+          }
           body * { visibility: hidden !important; }
           .print-receipt, .print-receipt * { visibility: visible !important; }
-          .print-receipt { position: fixed; top: 0; left: 0; width: 80mm; }
-          .receipt-root { width: 100%; }
+          .print-receipt {
+            position: absolute !important;
+            top: 0;
+            left: 0;
+            width: 80mm !important;
+            margin: 0 !important;
+            padding: 2mm !important;
+            box-sizing: border-box;
+            overflow: visible !important;
+            transform: none !important;
+            max-height: none !important;
+            height: auto !important;
+          }
+          .receipt-root {
+            width: 80mm !important;
+            margin: 0 !important;
+            padding: 2mm !important;
+            box-sizing: border-box;
+            overflow: visible !important;
+            max-height: none !important;
+            height: auto !important;
+          }
         }
       `}</style>
 
-      <div ref={ref} className="receipt-root print-receipt">
-
-        {/* ══ STORE HEADER ══ */}
-        <div className="receipt-center">
+      <div className="receipt-root print-receipt">
+        <div className="r-center r-bold" style={{ letterSpacing: 1, fontSize: 16, lineHeight: 1.1 }}>
           {storeNameLines.map((line, i) => (
-            <div key={i} className={`receipt-bold ${i === 0 ? 'receipt-large' : ''}`}>
-              {line}
-            </div>
+            <div key={i}>{line}</div>
           ))}
-          <div style={{ marginTop: 4 }}>{address}</div>
+        </div>
+
+        <div className="r-center" style={{ marginTop: 6 }}>
+          <div>{settings.address}</div>
           <div>{settings.phone}</div>
         </div>
 
-        <div className="receipt-divider" style={{ margin: '6px 0' }} />
-
-        {/* ══ INVOICE TITLE ══ */}
-        <div className="receipt-center receipt-bold" style={{ fontSize: 13, letterSpacing: 2, marginBottom: 6 }}>
-          {tr('invoice')}
+        <div className="r-center r-bold" style={{ marginTop: 6, fontSize: 18, letterSpacing: 1.2 }}>
+          INVOICE
         </div>
 
-        {/* ══ BILL META ══ */}
-        <div style={{ marginBottom: 4 }}>
-          <div className="receipt-row">
-            <span>{tr('invNo')}</span>
-            <span style={{ fontWeight: 700, letterSpacing: 0.5 }}>: {invNo}</span>
-          </div>
-          <div className="receipt-row">
-            <span>{tr('date')}</span>
-            <span>: {dateStr}&nbsp;&nbsp;{timeStr}</span>
-          </div>
-          <div className="receipt-row">
-            <span>{tr('terminal')}</span>
-            <span>: {settings.terminalId}</span>
-          </div>
-          <div className="receipt-row">
-            <span>{tr('cashier')}</span>
-            <span>: {bill.user.name}</span>
-          </div>
-          <div className="receipt-row">
-            <span>{tr('customer')}</span>
-            <span>: {bill.customer?.name ?? tr('posCustomer')}</span>
-          </div>
+        <div className="r-meta">
+          <div className="r-row"><span>Inv No</span><span>: {bill.billNumber}</span></div>
+          <div className="r-row"><span>Date</span><span>: {dateStr}     {timeStr}</span></div>
+          <div className="r-row"><span>Terminal</span><span>: {settings.terminalId}</span></div>
+          <div className="r-row"><span>Cashier</span><span>: {bill.user.name}</span></div>
+          <div className="r-row"><span>Customer</span><span>: {bill.customer?.name || 'POS CUSTOMER'}</span></div>
         </div>
 
-        <div className="receipt-divider-solid" />
-
-        {/* ══ ITEMS TABLE HEADER ══ */}
-        <div className="receipt-table-header">
-          <span>Code</span>
-          <span>{tr('description')}</span>
-          <span className="receipt-right">{tr('unitPrice')}</span>
-          <span className="receipt-right">{tr('netPrice')}</span>
-          <span className="receipt-right">{tr('amount')}</span>
+        <div className="r-col-head">
+          <span>{lang === 'si' ? '????' : 'Code'}</span>
+          <span>{lang === 'si' ? '????? ??' : 'Description'}</span>
+          <span className="r-right">{lang === 'si' ? '??? ???' : 'Unit'}</span>
+          <span className="r-right">{lang === 'si' ? '????? ???' : 'Net'}</span>
+          <span className="r-right">{lang === 'si' ? '???????' : 'Amount'}</span>
         </div>
 
-        {/* ══ ITEMS ══ */}
-        {bill.items.map((item, i) => {
-          const code = item.product.productCode ?? `PC${String(i + 1).padStart(4, '0')}`;
-          const unitPrice = item.price;
-          const netPrice = item.price; // after discount per unit if any
-          const lineTotal = item.total;
+        {bill.items.map((item, idx) => {
+          const code = item.product.productCode || `PC${String(idx + 1).padStart(4, '0')}`;
+          const unit = item.unitPrice ?? item.price;
+          const net = item.price;
           return (
-            <div key={i} style={{ marginBottom: 3 }}>
-              {/* Product Code + Name */}
-              <div style={{ fontWeight: 700, fontSize: 11 }}>
-                {code}&nbsp;&nbsp;{item.product.name}
-              </div>
-              {/* Qty + prices row */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '40px 1fr 60px 55px 62px',
-                fontSize: 11,
-                paddingLeft: 8
-              }}>
+            <div key={`${code}-${idx}`}>
+              <div className="r-item-name">{code} {item.product.name}</div>
+              <div className="r-item-values">
                 <span>{item.quantity}</span>
                 <span />
-                <span className="receipt-right">{unitPrice.toFixed(2)}</span>
-                <span className="receipt-right">{netPrice.toFixed(2)}</span>
-                <span className="receipt-right">{lineTotal.toFixed(2)}</span>
+                <span className="r-right">{amount(unit)}</span>
+                <span className="r-right">{amount(net)}</span>
+                <span className="r-right">{amount(item.total)}</span>
               </div>
             </div>
           );
         })}
 
-        <div className="receipt-divider-solid" />
+        <div className="r-divider" />
 
-        {/* ══ TOTAL AMOUNT ══ */}
-        <div className="receipt-row receipt-bold" style={{ fontSize: 13, margin: '4px 0' }}>
-          <span>{tr('totalAmount')}</span>
-          <span>{bill.total.toFixed(2)}</span>
+        <div className="r-total">
+          <span>****TOTAL AMOUNT****</span>
+          <span>{amount(bill.total)}</span>
         </div>
 
-        {/* ══ PAYMENT METHOD ══ */}
-        {bill.paymentMethod === 'CASH' && (
+        <div className="r-row">
+          <span className="r-bold">{paymentText}</span>
+          <span className="r-bold">{amount(paidValue)}</span>
+        </div>
+
+        <div className="r-row" style={{ marginTop: 1 }}>
+          <span className="r-bold" style={{ fontSize: 14 }}>BALANCE</span>
+          <span className="r-balance">{amount(balanceValue)}</span>
+        </div>
+
+        <div className="r-row" style={{ marginTop: 4 }}>
+          <span className="r-bold">Item Count</span>
+          <span>{lineCount}</span>
+        </div>
+        <div className="r-row">
+          <span className="r-bold">End Time</span>
+          <span>{endTime}</span>
+        </div>
+
+        <div className="r-divider" style={{ marginTop: 4 }} />
+
+        {settings.showSavingsOnReceipt && savings > 0 && (
           <>
-            <div className="receipt-row">
-              <span style={{ fontWeight: 700 }}>CASH</span>
-              <span style={{ fontWeight: 700 }}>{bill.paidAmount.toFixed(2)}</span>
-            </div>
-            {bill.changeAmount > 0 && (
-              <div className="receipt-row">
-                <span>{tr('balance')}</span>
-                <span style={{ fontWeight: 700 }}>{bill.changeAmount.toFixed(2)}</span>
-              </div>
-            )}
+            <div className="r-saving-title">?? ???? ????</div>
+            <div className="r-saving-amount">{amount(savings)}</div>
           </>
         )}
 
-        {(bill.paymentMethod === 'CARD' || bill.paymentMethod === 'VISA') && (
-          <div className="receipt-row">
-            <span style={{ fontWeight: 700 }}>
-              VISA {bill.paidAmount > 0 ? String(bill.paidAmount).slice(-4).padStart(10, '*') : ''}
-            </span>
-            <span style={{ fontWeight: 700 }}>{bill.total.toFixed(2)}</span>
-          </div>
-        )}
+        <div className="r-footnote">{settings.receiptFooter}</div>
+        <div className="r-footnote" style={{ fontSize: 10 }}>{settings.receiptFooterSi}</div>
 
-        {bill.paymentMethod === 'QR' && (
-          <div className="receipt-row">
-            <span style={{ fontWeight: 700 }}>QR PAY</span>
-            <span style={{ fontWeight: 700 }}>{bill.total.toFixed(2)}</span>
-          </div>
-        )}
-
-        {/* ══ BALANCE (ALWAYS) ══ */}
-        {bill.paymentMethod !== 'CASH' && (
-          <div className="receipt-row receipt-bold">
-            <span>{tr('balance')}</span>
-            <span>{bill.changeAmount > 0 ? '0.00' : bill.changeAmount.toFixed(2)}</span>
-          </div>
-        )}
-
-        <div className="receipt-divider" />
-
-        {/* ══ ITEM COUNT + END TIME ══ */}
-        <div className="receipt-row" style={{ fontSize: 11 }}>
-          <span>{tr('itemCount')}</span>
-          <span style={{ fontWeight: 700 }}>
-            {bill.items.reduce((s, i) => s + i.quantity, 0)}
-          </span>
-        </div>
-        <div className="receipt-row" style={{ fontSize: 11 }}>
-          <span>{tr('endTime')}</span>
-          <span>{new Date().toTimeString().slice(0, 10)}</span>
-        </div>
-
-        {/* ══ SAVINGS BOX ══ */}
-        {settings.showSavingsOnReceipt && totalSavings > 0 && (
-          <div className="receipt-savings" style={{ marginTop: 6 }}>
-            <div style={{ fontSize: 11, marginBottom: 2 }}>
-              {lang === 'si' ? 'ඔබ ඉතිරි කළා' : 'You Saved'}
-            </div>
-            <div style={{ fontSize: 20, fontWeight: 900 }}>
-              {totalSavings.toFixed(2)}
-            </div>
-          </div>
-        )}
-
-        <div className="receipt-divider" style={{ marginTop: 6 }} />
-
-        {/* ══ FOOTER ══ */}
-        <div className="receipt-center" style={{ marginTop: 6, fontSize: 11 }}>
-          <div>{footer}</div>
-          {lang === 'en' && (
-            <div style={{ fontFamily: "'Noto Sans Sinhala', sans-serif", marginTop: 2, fontSize: 10 }}>
-              {settings.receiptFooterSi}
-            </div>
-          )}
-        </div>
-
-        <div style={{ marginTop: 8, textAlign: 'center', fontSize: 9, color: '#555' }}>
-          software by supervision (www.serp.lk)
-        </div>
+        <div className="r-software">software by supervision (www.serp.lk)</div>
       </div>
-    </>
+    </div>
   );
 });
 

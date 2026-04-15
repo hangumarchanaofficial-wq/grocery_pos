@@ -32,6 +32,8 @@ export default function LoginPage() {
     try {
       await login(email, password);
       toast.success('Welcome back!');
+      router.replace('/dashboard');
+      router.refresh();
     } catch (error: unknown) {
       toast.error((error as Error).message || 'Login failed');
     } finally {

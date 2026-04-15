@@ -21,6 +21,8 @@ export async function middleware(request: NextRequest) {
     }
   );
 
+  // getUser() is more reliable for route protection, especially right after sign-in
+  // when cookie/session propagation can still be settling.
   const {
     data: { user },
   } = await supabase.auth.getUser();

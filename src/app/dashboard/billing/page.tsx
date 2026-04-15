@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import ProductSearch from '@/components/billing/ProductSearch';
 import CustomerSearch from '@/components/billing/CustomerSearch';
 import Cart from '@/components/billing/Cart';
@@ -59,19 +59,80 @@ export default function BillingPage() {
   const [lastBill, setLastBill] = useState<ReceiptBill | null>(null);
   const receiptRef = useRef<HTMLDivElement>(null);
 
+  const printReceipt = useCallback((targetWindow?: Window | null) => {
+    const receiptNode = receiptRef.current;
+    if (!receiptNode) {
+      targetWindow?.close();
+      toast.error('No receipt available to print');
+      return;
+    }
+
+    const printWindow = targetWindow ?? window.open('', '_blank', 'width=420,height=900');
+    if (!printWindow) {
+      toast.error('Allow popups to print receipts');
+      return;
+    }
+
+    const receiptMarkup = receiptNode.outerHTML;
+    printWindow.document.open();
+    printWindow.document.write(`
+      <!doctype html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <title>Receipt ${lastBill?.billNumber ?? ''}</title>
+          <style>
+            html, body {
+              margin: 0;
+              padding: 0;
+              background: #ffffff;
+            }
+            body {
+              width: 80mm;
+              min-height: 100%;
+            }
+          </style>
+        </head>
+        <body>
+          ${receiptMarkup}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+
+    const runPrint = () => {
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    };
+
+    if (printWindow.document.readyState === 'complete') {
+      setTimeout(runPrint, 150);
+    } else {
+      printWindow.onload = () => setTimeout(runPrint, 150);
+    }
+  }, [lastBill]);
+
   const handlePayment = async (method: string, paidAmount: number, discount: number) => {
+    const pendingPrintWindow = window.open('', '_blank', 'width=420,height=900');
     try {
       const bill = await submitBill(method, paidAmount, discount);
       setLastBill(bill);
       toast.success(`Bill ${bill.billNumber} created!`);
-      setTimeout(() => { window.print(); }, 400);
+      setTimeout(() => {
+        printReceipt(pendingPrintWindow);
+      }, 250);
     } catch (error: unknown) {
+      pendingPrintWindow?.close();
       toast.error((error as Error).message);
       throw error;
     }
   };
 
-  const handlePrint = () => { if (lastBill) window.print(); };
+  const handlePrint = () => {
+    if (lastBill) printReceipt();
+  };
 
   const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const cartTotals = calculateBillTotals({ subtotal, taxRatePercent: settings.taxRate });

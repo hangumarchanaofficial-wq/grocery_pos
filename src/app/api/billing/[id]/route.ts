@@ -9,12 +9,24 @@ export async function GET(_req: Request, { params }: RouteParams) {
   if (!user) return errorResponse('Unauthorized', 401);
   const { id } = await params;
 
-  const { data, error } = await adminClient
+  const { data: bill, error: billError } = await adminClient
     .from('bills')
-    .select('*, bill_items(*, products(name, barcode, category, unit)), customers(*), users(name, email)')
+    .select('*, customers(*), users(name)')
     .eq('id', id)
     .single();
 
-  if (error || !data) return errorResponse('Bill not found', 404);
-  return successResponse(transformRow(data as Record<string, unknown>));
+  if (billError || !bill) return errorResponse('Bill not found', 404);
+
+  const { data: billItems, error: itemsError } = await adminClient
+    .from('bill_items')
+    .select('*, products(name, barcode, category, unit)')
+    .eq('bill_id', id);
+
+  if (itemsError) return errorResponse(itemsError.message, 500);
+
+  const normalizedBill = transformRow<Record<string, unknown>>(bill as Record<string, unknown>);
+  return successResponse({
+    ...normalizedBill,
+    billItems: (billItems || []).map((item) => transformRow(item as Record<string, unknown>)),
+  });
 }

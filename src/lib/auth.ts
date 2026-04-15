@@ -23,6 +23,23 @@ function authUserFromMetadata(user: {
   return { id: user.id, name, role, active: true };
 }
 
+/**
+ * Fast “is someone logged in?” check for hot read routes (e.g. POS product search).
+ * Uses the session from cookies — no extra round trip to Supabase Auth.
+ * `/api/*` is still protected by middleware; this avoids duplicating `getUser()` + DB profile work per request.
+ */
+export async function getSessionUserId(): Promise<string | null> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    return session?.user?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getUserFromRequest(): Promise<AuthUser | null> {
   try {
     const supabase = await createClient();

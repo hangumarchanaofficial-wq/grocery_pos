@@ -5,11 +5,11 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, ShoppingCart, Package, Users,
-  BarChart3, Settings, Brain, LogOut, ShoppingBag,
+  BarChart3, Settings, Brain, LogOut, ShoppingBag, ReceiptText,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import Badge from '@/components/ui/Badge';
@@ -18,6 +18,7 @@ import { isNavItemActive } from '@/lib/navigation';
 const navItems = [
   { href: '/dashboard',              label: 'Dashboard',      icon: LayoutDashboard, roles: ['OWNER', 'MANAGER', 'CASHIER'] },
   { href: '/dashboard/billing',      label: 'New Bill',       icon: ShoppingCart,    roles: ['OWNER', 'MANAGER', 'CASHIER'] },
+  { href: '/dashboard/transactions', label: 'Transactions',   icon: ReceiptText,     roles: ['OWNER'] },
   { href: '/dashboard/inventory',    label: 'Inventory',      icon: Package,         roles: ['OWNER', 'MANAGER'] },
   { href: '/dashboard/products',     label: 'Products',       icon: ShoppingBag,     roles: ['OWNER', 'MANAGER'] },
   { href: '/dashboard/customers',    label: 'Customers',      icon: Users,           roles: ['OWNER', 'MANAGER', 'CASHIER'] },
@@ -33,6 +34,7 @@ export interface SidebarProps {
 
 export default function Sidebar({ onNavigate }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuth();
 
   return (
@@ -103,9 +105,11 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
         </div>
         <button
           type="button"
-          onClick={() => {
-            logout();
+          onClick={async () => {
+            await logout();
             onNavigate?.();
+            router.replace('/');
+            router.refresh();
           }}
           className="flex w-full items-center gap-2 rounded-[14px] px-3 py-2.5 text-sm text-slate-500 transition-colors hover:bg-red-500/[0.06] hover:text-red-300"
         >

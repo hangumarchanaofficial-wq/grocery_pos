@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Search, ChevronLeft, ChevronRight, ShieldCheck, Plus, ArrowRight } from 'lucide-react';
 import Input from '@/components/ui/Input';
 import { useAuth } from '@/hooks/useAuth';
@@ -31,42 +31,62 @@ export default function ProductSearch() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [page, setPage] = useState(0);
+  const [searchLoading, setSearchLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { apiFetch } = useAuth();
   const addItem = useCartStore((s) => s.addItem);
 
-  const searchProducts = useCallback(async (q: string) => {
-    const trimmed = q.trim();
+  useEffect(() => {
+    const trimmed = query.trim();
     if (trimmed.length < 1) {
       setResults([]);
       setShowResults(false);
       setPage(0);
+      setSearchLoading(false);
       return;
     }
-    try {
-      const res = await apiFetch(`/api/products/search?q=${encodeURIComponent(trimmed)}`);
-      const data = await res.json();
-      if (!res.ok) {
+
+    setShowResults(true);
+    setResults([]);
+    setSearchLoading(true);
+
+    // Short queries are broad; slightly longer debounce avoids redundant /api calls.
+    const debounceMs = trimmed.length <= 2 ? 380 : 280;
+    const ac = new AbortController();
+
+    const id = setTimeout(async () => {
+      try {
+        const res = await apiFetch(
+          `/api/products/search?q=${encodeURIComponent(trimmed)}`,
+          { signal: ac.signal }
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          setResults([]);
+          setShowResults(true);
+          setPage(0);
+          return;
+        }
+        setResults(Array.isArray(data) ? data : []);
+        setShowResults(true);
+        setPage(0);
+      } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') return;
         setResults([]);
         setShowResults(true);
         setPage(0);
-        return;
+      } finally {
+        setSearchLoading(false);
       }
-      setResults(Array.isArray(data) ? data : []);
-      setShowResults(true);
-      setPage(0);
-    } catch {
-      setResults([]);
-      setShowResults(true);
-      setPage(0);
-    }
-  }, [apiFetch]);
+    }, debounceMs);
 
-  useEffect(() => {
-    const timer = setTimeout(() => searchProducts(query), 400);
-    return () => clearTimeout(timer);
-  }, [query, searchProducts]);
+    return () => {
+      clearTimeout(id);
+      ac.abort();
+      setSearchLoading(false);
+    };
+  }, [query, apiFetch]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -130,7 +150,15 @@ export default function ProductSearch() {
           className="mt-2 w-full overflow-hidden rounded-[16px] sm:rounded-[22px] border border-white/10 bg-[rgba(12,20,40,0.98)] shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl"
           aria-label="Product matches"
         >
-          {results.length > 0 ? (
+          {searchLoading ? (
+            <div className="flex items-center justify-center gap-3 px-4 py-10 text-sm text-slate-400">
+              <div
+                className="h-5 w-5 animate-spin rounded-full border-2 border-slate-600 border-t-emerald-400"
+                aria-hidden
+              />
+              <span>Searching products…</span>
+            </div>
+          ) : results.length > 0 ? (
             <>
               {/* Narrow view: cards — from md up use table so POS side-by-side layout shows columns */}
               <div className="space-y-2 px-2.5 pb-1 pt-2 md:hidden">

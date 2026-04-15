@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Heart, ShieldCheck, Cpu, Github, Mail, Globe } from 'lucide-react';
+import { Heart, ShieldCheck, Cpu } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -77,7 +77,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Status / Contact */}
+          {/* Status */}
           <div className="space-y-3">
             <h4 className="text-xs font-semibold uppercase tracking-widest text-slate-400">
               Status
@@ -99,30 +99,6 @@ export default function Footer() {
                 <span className="text-[13px] text-slate-500">SSL Encrypted</span>
               </div>
             </div>
-
-            {/* Social / links */}
-            <div className="flex items-center gap-3 pt-2">
-              <a
-                href="https://github.com/hangumarchanaofficial-wq/grocery_pos"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-lg bg-white/[0.04] p-2 text-slate-500 ring-1 ring-white/[0.06] transition-all hover:bg-white/[0.08] hover:text-slate-300"
-              >
-                <Github className="h-4 w-4" />
-              </a>
-              <a
-                href="mailto:support@grocerypos.dev"
-                className="rounded-lg bg-white/[0.04] p-2 text-slate-500 ring-1 ring-white/[0.06] transition-all hover:bg-white/[0.08] hover:text-slate-300"
-              >
-                <Mail className="h-4 w-4" />
-              </a>
-              <a
-                href="#"
-                className="rounded-lg bg-white/[0.04] p-2 text-slate-500 ring-1 ring-white/[0.06] transition-all hover:bg-white/[0.08] hover:text-slate-300"
-              >
-                <Globe className="h-4 w-4" />
-              </a>
-            </div>
           </div>
         </div>
 
@@ -138,7 +114,7 @@ export default function Footer() {
             Crafted with
             <Heart className="h-3 w-3 text-rose-500/70" fill="currentColor" />
             by
-            <span className="font-medium text-slate-500">Archana&apos;s Dev Studio</span>
+            <span className="font-medium text-slate-500">HangWorks</span>
           </p>
           <p className="text-[12px] text-slate-600">
             v2.0.0 &middot; Next.js 16.2 &middot; Prisma 7
