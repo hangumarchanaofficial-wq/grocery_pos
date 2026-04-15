@@ -1,27 +1,11 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
 import type { SalesInsight } from '@/types';
 import { TrendingUp, TrendingDown, Flame, Snail, BarChart3 } from 'lucide-react';
 
-export default function TopProducts() {
-  const { apiFetch } = useAuth();
-  const [insights, setInsights] = useState<SalesInsight[]>([]);
-  const [loading, setLoading] = useState(true);
+type Props = { insights: SalesInsight[]; loading: boolean };
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await apiFetch('/api/ai/insights');
-        const data = await res.json();
-        setInsights(data.insights ?? []);
-      } catch { setInsights([]); }
-      finally { setLoading(false); }
-    }
-    load();
-  }, [apiFetch]);
-
+export default function TopProducts({ insights, loading }: Props) {
   const topSelling = insights.filter(i => i.type === 'top_selling');
   const lowSelling = insights.filter(i => i.type === 'low_selling');
 

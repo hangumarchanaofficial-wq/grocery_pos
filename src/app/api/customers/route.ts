@@ -1,6 +1,15 @@
 import { adminClient } from '@/lib/supabase/admin';
 import { getUserFromRequest, errorResponse, successResponse } from '@/lib/auth';
+import { sanitizeIlikePattern } from '@/lib/sanitizeSearch';
 import { transformRows, transformRow } from '@/lib/utils';
+
+function billCountFromRow(c: Record<string, unknown>): number {
+  const bills = c.bills as { count?: number }[] | undefined;
+  if (Array.isArray(bills) && bills[0] && typeof bills[0].count === 'number') {
+    return Number(bills[0].count);
+  }
+  return 0;
+}
 
 export async function GET(req: Request) {
   const user = await getUserFromRequest();
@@ -13,21 +22,32 @@ export async function GET(req: Request) {
 
   let query = adminClient
     .from('customers')
-    .select('id, name, phone, email, address, created_at, bills(id)', { count: 'exact' })
+    .select('id, name, phone, email, address, created_at, bills(count)', { count: 'exact' })
     .order('name')
     .range((page - 1) * limit, page * limit - 1);
 
-  if (search) query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%`);
+  if (search) {
+    const q = sanitizeIlikePattern(search);
+    if (q) query = query.or(`name.ilike.%${q}%,phone.ilike.%${q}%`);
+  }
 
   const { data, count, error } = await query;
   if (error) return errorResponse(error.message);
 
-  const customers = (data || []).map((c: Record<string, unknown>) => ({
-    ...(transformRow<Record<string, unknown>>(c)),
-    _count: { bills: Array.isArray(c.bills) ? (c.bills as unknown[]).length : 0 },
-  }));
+  const customers = (data || []).map((c: Record<string, unknown>) => {
+    const { bills: _b, ...rest } = c;
+    return {
+      ...(transformRow<Record<string, unknown>>(rest)),
+      _count: { bills: billCountFromRow(c) },
+    };
+  });
 
-  return successResponse(customers);
+  return successResponse({
+    customers,
+    total: count ?? 0,
+    page,
+    limit,
+  });
 }
 
 export async function POST(req: Request) {

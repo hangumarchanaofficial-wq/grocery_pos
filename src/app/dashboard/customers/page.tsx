@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -23,7 +23,7 @@ interface Customer {
   _count: { bills: number };
 }
 
-const PAGE_SIZE = 10;
+const API_PAGE_SIZE = 50;
 
 interface CustomerDetails {
   name: string;
@@ -51,31 +51,40 @@ export default function CustomersPage() {
   const [form, setForm] = useState({ name: '', phone: '', email: '', address: '' });
   const [saving, setSaving] = useState(false);
   const [tablePage, setTablePage] = useState(0);
+  const [totalCustomers, setTotalCustomers] = useState(0);
 
   const loadCustomers = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
       if (search) params.set('search', search);
-      params.set('limit', '500');
+      params.set('limit', String(API_PAGE_SIZE));
+      params.set('page', String(tablePage + 1));
       const res = await apiFetch(`/api/customers?${params}`);
       const data = await res.json();
-      setCustomers(Array.isArray(data) ? data : []);
+      if (Array.isArray(data)) {
+        setCustomers(data);
+        setTotalCustomers(data.length);
+      } else {
+        setCustomers(data.customers ?? []);
+        setTotalCustomers(typeof data.total === 'number' ? data.total : 0);
+      }
     } catch { /* ignore */ }
     finally { setLoading(false); }
-  }, [apiFetch, search]);
+  }, [apiFetch, search, tablePage]);
 
   useEffect(() => { loadCustomers(); }, [loadCustomers]);
 
-  const maxPage = Math.max(0, Math.ceil(customers.length / PAGE_SIZE) - 1);
-  const totalPages = Math.max(1, Math.ceil(customers.length / PAGE_SIZE));
+  useEffect(() => {
+    setTablePage(0);
+  }, [search]);
+
+  const maxPage = Math.max(0, Math.ceil(totalCustomers / API_PAGE_SIZE) - 1);
+  const totalPages = Math.max(1, Math.ceil(totalCustomers / API_PAGE_SIZE));
   const activePage = Math.min(tablePage, maxPage);
-  const pageRows = useMemo(() => {
-    const start = activePage * PAGE_SIZE;
-    return customers.slice(start, start + PAGE_SIZE);
-  }, [customers, activePage]);
-  const rangeStart = customers.length === 0 ? 0 : activePage * PAGE_SIZE + 1;
-  const rangeEnd = Math.min((activePage + 1) * PAGE_SIZE, customers.length);
+  const pageRows = customers;
+  const rangeStart = customers.length === 0 ? 0 : tablePage * API_PAGE_SIZE + 1;
+  const rangeEnd = tablePage * API_PAGE_SIZE + customers.length;
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,6 +96,7 @@ export default function CustomersPage() {
     try {
       const res = await apiFetch('/api/customers', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
       if (!res.ok) {
@@ -199,7 +209,7 @@ export default function CustomersPage() {
               {'–'}
               <span className="tabular-nums text-slate-400">{rangeEnd}</span>
               <span className="text-slate-600"> of </span>
-              <span className="tabular-nums text-slate-400">{customers.length}</span>
+              <span className="tabular-nums text-slate-400">{totalCustomers}</span>
             </p>
             <div className="flex items-center justify-center gap-2">
               <button

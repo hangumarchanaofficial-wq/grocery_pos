@@ -3,6 +3,8 @@ import { getUserFromRequest, errorResponse, successResponse } from '@/lib/auth';
 import { calculateBillTotals } from '@/lib/billing';
 import { transformRow } from '@/lib/utils';
 
+type ProcessBillResult = { bill_id: string; bill_number: string };
+
 export async function POST(req: Request) {
   const user = await getUserFromRequest();
   if (!user) return errorResponse('Unauthorized', 401);
@@ -11,82 +13,45 @@ export async function POST(req: Request) {
   if (!items || !Array.isArray(items) || items.length === 0)
     return errorResponse('Cart is empty', 400);
 
-  const productIds = [...new Set(items.map((item: any) => item.productId).filter(Boolean))];
-  const { data: products, error: productsError } = await adminClient
-    .from('products')
-    .select('id, quantity, active')
-    .in('id', productIds);
-
-  if (productsError) return errorResponse(productsError.message);
-
-  const productMap = new Map((products || []).map((product: any) => [product.id, product]));
-  for (const item of items) {
-    const product = productMap.get(item.productId);
-    if (!product || !product.active) return errorResponse('One or more products are unavailable', 400);
-    if (item.quantity > product.quantity) {
-      return errorResponse(`Insufficient stock for ${item.name || 'a product'}`, 400);
-    }
-  }
-
   const totals = calculateBillTotals({
     subtotal: items.reduce((s: number, i: any) => s + i.price * i.quantity, 0),
     discount: discount || 0,
     taxRatePercent: typeof taxRate === 'number' ? taxRate : 5,
   });
 
-  const billNumber = `BILL-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Date.now().toString().slice(-4)}`;
-
-  // ── Insert bill ──
-  const { data: bill, error: billError } = await adminClient
-    .from('bills')
-    .insert({
-      bill_number:    billNumber,
-      subtotal:       totals.subtotal,
-      tax:            totals.tax,
-      discount:       totals.discount,
-      total:          totals.total,
-      payment_method: paymentMethod,
-      paid_amount:    paidAmount,
-      change_amount:  Math.max(0, paidAmount - totals.total),
-      customer_id:    customerId || null,
-      user_id:        user.id,
-    })
-    .select()
-    .single();
-
-  if (billError) return errorResponse(billError.message);
-
-  // ── Insert bill items ──
-  const billItems = items.map((item: any) => ({
-    bill_id:    bill.id,
+  const pItems = items.map((item: any) => ({
     product_id: item.productId,
-    quantity:   item.quantity,
-    price:      item.price,
-    cost_price: item.costPrice || 0,
-    total:      item.price * item.quantity,
+    quantity: item.quantity,
+    price: item.price,
+    cost_price: item.costPrice ?? 0,
+    total: item.price * item.quantity,
   }));
 
-  const { error: itemsError } = await adminClient
-    .from('bill_items')
-    .insert(billItems);
+  const { data: rpcData, error: rpcError } = await adminClient.rpc('process_bill', {
+    p_items: pItems,
+    p_subtotal: totals.subtotal,
+    p_tax: totals.tax,
+    p_discount: totals.discount,
+    p_total: totals.total,
+    p_payment_method: paymentMethod,
+    p_paid_amount: paidAmount,
+    p_change_amount: Math.max(0, paidAmount - totals.total),
+    p_customer_id: customerId || null,
+    p_user_id: user.id,
+  });
 
-  if (itemsError) {
-    await adminClient.from('bills').delete().eq('id', bill.id);
-    return errorResponse(itemsError.message);
-  }
+  if (rpcError) return errorResponse(rpcError.message);
 
-  // ── Decrement stock ──
-  for (const item of items) {
-    const { error } = await adminClient.rpc('decrement_stock', {
-      p_product_id: item.productId,
-      p_quantity:   item.quantity,
-    });
-    if (error) {
-      await adminClient.from('bill_items').delete().eq('bill_id', bill.id);
-      await adminClient.from('bills').delete().eq('id', bill.id);
-      return errorResponse(error.message);
-    }
-  }
+  const rid = rpcData as ProcessBillResult | null;
+  if (!rid?.bill_id) return errorResponse('Billing failed', 500);
+
+  const { data: bill, error: billError } = await adminClient
+    .from('bills')
+    .select()
+    .eq('id', rid.bill_id)
+    .single();
+
+  if (billError || !bill) return errorResponse(billError?.message ?? 'Bill not found', 500);
 
   const normalizedBill = transformRow<Record<string, any>>(bill as Record<string, unknown>);
 
@@ -94,14 +59,14 @@ export async function POST(req: Request) {
     ...normalizedBill,
     user: { name: user.name },
     customer: customerId ? { id: customerId } : null,
-    items: billItems.map((item: any, index: number) => ({
+    items: items.map((item: any, index: number) => ({
       quantity: item.quantity,
       price: item.price,
-      unitPrice: item.cost_price,
-      total: item.total,
+      unitPrice: item.costPrice,
+      total: item.price * item.quantity,
       product: {
-        name: items[index]?.name || `Item ${index + 1}`,
-        productCode: items[index]?.productCode || items[index]?.barcode || undefined,
+        name: item.name || `Item ${index + 1}`,
+        productCode: item.productCode || item.barcode || undefined,
       },
     })),
   }, 201);

@@ -1,11 +1,14 @@
 ﻿'use client';
 
+import dynamic from 'next/dynamic';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import Sidebar from '@/components/layout/Sidebar';
 import TopBar from '@/components/layout/TopBar';
 import MobileNav from '@/components/layout/MobileNav';
 import ProtectedRoute from '@/components/layout/ProtectedRoute';
-import Footer from '@/components/layout/Footer';
+import { DashboardAIProvider } from '@/contexts/DashboardAIContext';
+
+const Footer = dynamic(() => import('@/components/layout/Footer'), { ssr: false });
 
 const MOBILE_MENU_CLOSE_DELAY_MS = 2000;
 
@@ -44,6 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <ProtectedRoute>
+      <DashboardAIProvider>
       <div className="flex min-h-screen bg-[#0a0a0f]">
         <div className="hidden lg:block">
           <Sidebar />
@@ -77,6 +81,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {!mobileMenuOpen && <MobileNav />}
         </div>
       </div>
+      </DashboardAIProvider>
     </ProtectedRoute>
   );
 }

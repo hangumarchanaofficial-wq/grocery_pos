@@ -43,7 +43,7 @@ export function generateProductCode(
   const prefixes: Record<string, string> = {
     VEGETABLES: "VEG",
     FRUITS: "FRT",
-    GROCERY_ITEMS: "GRC",
+    GROCERIES: "GRC",
     FOODS: "FDS",
     COSMETIC: "CSM",
     CLOTHES: "CLT",
@@ -54,13 +54,4 @@ export function generateProductCode(
   return `${prefix}-${count}`;
 }
 
-/**
- * Format currency
- */
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-LK", {
-    style: "currency",
-    currency: "LKR",
-    minimumFractionDigits: 2,
-  }).format(amount);
-}
+export { formatCurrency } from "@/lib/utils";

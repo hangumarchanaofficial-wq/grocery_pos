@@ -1,5 +1,6 @@
 ﻿'use client';
 
+import { memo } from 'react';
 import { DollarSign, Receipt, TrendingUp, Package, AlertTriangle, Clock } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 
@@ -14,7 +15,7 @@ interface StatsCardsProps {
   };
 }
 
-export default function StatsCards({ stats }: StatsCardsProps) {
+function StatsCardsInner({ stats }: StatsCardsProps) {
   const cards = [
     {
       label: "Today's Sales",
@@ -121,3 +122,5 @@ export default function StatsCards({ stats }: StatsCardsProps) {
     </div>
   );
 }
+
+export default memo(StatsCardsInner);

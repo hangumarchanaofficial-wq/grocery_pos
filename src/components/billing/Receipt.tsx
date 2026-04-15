@@ -83,11 +83,9 @@ const Receipt = forwardRef<HTMLDivElement, ReceiptProps>(({ bill, forceLang }, r
     <>
       {/* ─── Print-only CSS injected inline ─── */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;700&display=swap');
-        
         .receipt-root {
           font-family: ${lang === 'si'
-            ? "'Noto Sans Sinhala', 'Iskoola Pota', monospace"
+            ? "var(--font-sinhala), 'Iskoola Pota', monospace"
             : "'Courier New', 'Courier', monospace"};
           font-size: 12px;
           line-height: 1.5;

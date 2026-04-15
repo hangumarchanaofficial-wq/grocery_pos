@@ -53,6 +53,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={item.href === '/dashboard/billing'}
                 onClick={() => onNavigate?.()}
                 className={cn(
                   'group relative flex h-11 shrink-0 items-center gap-3 rounded-xl pl-2.5 pr-3 text-[13px] font-medium transition-colors duration-200',

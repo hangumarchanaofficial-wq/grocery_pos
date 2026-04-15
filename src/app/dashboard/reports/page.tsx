@@ -4,6 +4,7 @@
 
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import Card from '@/components/ui/Card';
@@ -14,10 +15,13 @@ import Badge from '@/components/ui/Badge';
 import InsightsPanel from '@/components/ai/InsightsPanel';
 import { Download, TrendingUp, Receipt, DollarSign, BarChart3 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-} from 'recharts';
+import type { SalesInsight } from '@/types';
 import toast from 'react-hot-toast';
+
+const ReportsSalesChart = dynamic(() => import('@/components/reports/ReportsSalesChart'), {
+  ssr: false,
+  loading: () => <div className="h-80 animate-pulse rounded-xl bg-white/[0.03]" />,
+});
 
 interface ReportRow {
   date: string;
@@ -43,6 +47,8 @@ export default function ReportsPage() {
   const [report, setReport] = useState<ReportRow[]>([]);
   const [summary, setSummary] = useState<ReportSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [aiInsights, setAiInsights] = useState<SalesInsight[]>([]);
+  const [aiLoading, setAiLoading] = useState(true);
 
   const formatChartValue = (
     value: number | string | readonly (number | string)[] | undefined
@@ -64,6 +70,25 @@ export default function ReportsPage() {
   }, [apiFetch, period, from, to]);
 
   useEffect(() => { loadReport(); }, [loadReport]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadAi() {
+      try {
+        const res = await apiFetch('/api/ai/analysis');
+        const json = await res.json();
+        if (!cancelled && res.ok) setAiInsights(json.insights ?? []);
+      } catch {
+        if (!cancelled) setAiInsights([]);
+      } finally {
+        if (!cancelled) setAiLoading(false);
+      }
+    }
+    loadAi();
+    return () => {
+      cancelled = true;
+    };
+  }, [apiFetch]);
 
   const handleExport = async () => {
     try {
@@ -171,42 +196,11 @@ export default function ReportsPage() {
             <p className="section-subtitle mt-1 text-sm">Revenue flow across selected period.</p>
           </div>
         </div>
-        {loading ? (
-          <div className="flex h-72 items-center justify-center text-slate-500">Loading chart data...</div>
-        ) : (
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={report}>
-                <defs>
-                  <linearGradient id="reportSalesGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.08)" vertical={false} />
-                <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} tickFormatter={formatChartValue} axisLine={false} tickLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: '18px',
-                    border: '1px solid rgba(148,163,184,0.14)',
-                    background: 'rgba(15,23,42,0.94)',
-                    boxShadow: '0 30px 80px rgba(2,6,23,0.32)',
-                    color: '#e2e8f0',
-                  }}
-                  formatter={(value) => [formatChartValue(value)]}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="totalSales"
-                  stroke="#22c55e"
-                  fill="url(#reportSalesGrad)"
-                  strokeWidth={2}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+        <ReportsSalesChart
+          report={report}
+          loading={loading}
+          formatChartValue={formatChartValue}
+        />
       </Card>
 
       {/* Detailed Table */}
@@ -249,7 +243,7 @@ export default function ReportsPage() {
           </div>
           <h3 className="section-title text-xl font-semibold">AI Sales Insights</h3>
         </div>
-        <InsightsPanel />
+        <InsightsPanel insights={aiInsights} loading={aiLoading} />
       </div>
     </div>
   );

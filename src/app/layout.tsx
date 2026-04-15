@@ -3,19 +3,28 @@
 // ============================================================
 
 import type { Metadata } from 'next';
-import { Space_Grotesk, JetBrains_Mono } from 'next/font/google';
+import { Space_Grotesk, JetBrains_Mono, Noto_Sans_Sinhala } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-sans',
+  display: 'swap',
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
+  weight: ['400'],
   variable: '--font-mono',
+  display: 'swap',
+});
+
+const notoSinhala = Noto_Sans_Sinhala({
+  subsets: ['sinhala'],
+  weight: ['400', '700'],
+  variable: '--font-sinhala',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -27,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+        className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${notoSinhala.variable} font-sans antialiased`}
       >
         {children}
         <Toaster

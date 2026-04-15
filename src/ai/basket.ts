@@ -14,12 +14,29 @@ export interface BasketPair {
 }
 
 export async function generateBasketAnalysis(): Promise<BasketPair[]> {
-  // Fetch all bill_items with product name, grouped by bill
-  const { data: billItems } = await adminClient
+  const since = new Date(Date.now() - 30 * 86400000).toISOString();
+  const { data: recentBills, error: billsError } = await adminClient
+    .from('bills')
+    .select('id')
+    .gte('created_at', since);
+
+  if (billsError) {
+    console.error('generateBasketAnalysis (bills):', billsError.message);
+    return [];
+  }
+  const billIds = (recentBills || []).map((b: { id: string }) => b.id);
+  if (billIds.length === 0) return [];
+
+  const { data: billItems, error } = await adminClient
     .from('bill_items')
     .select('bill_id, product_id, products(name)')
+    .in('bill_id', billIds)
     .order('bill_id');
 
+  if (error) {
+    console.error('generateBasketAnalysis:', error.message);
+    return [];
+  }
   if (!billItems || billItems.length === 0) return [];
 
   // Group by bill_id

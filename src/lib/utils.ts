@@ -25,16 +25,6 @@ export function formatCurrency(amount: number): string {
     }).format(amount);
 }
 
-/** Standard JSON error response */
-export function errorResponse(message: string, status: number = 400) {
-    return Response.json({ error: message }, { status });
-}
-
-/** Standard JSON success response */
-export function successResponse(data: unknown, status: number = 200) {
-    return Response.json(data, { status });
-}
-
 /** Calculate days between two dates */
 export function daysBetween(date1: Date, date2: Date): number {
     const diff = date2.getTime() - date1.getTime();

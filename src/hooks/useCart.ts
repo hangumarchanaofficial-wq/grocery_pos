@@ -27,6 +27,7 @@ export function useCart() {
 
         const res = await apiFetch('/api/billing', {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 items,
                 customerId: cart.customerId,

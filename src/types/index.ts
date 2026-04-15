@@ -4,7 +4,7 @@
 
 // ── Inline types (no Prisma dependency) ──
 export type Role = 'OWNER' | 'MANAGER' | 'CASHIER';
-export type Category = 'VEGETABLES' | 'FRUITS' | 'GROCERY_ITEMS' | 'FOODS' | 'COSMETIC' | 'CLOTHES' | 'OTHERS';
+export type Category = 'VEGETABLES' | 'FRUITS' | 'GROCERIES' | 'FOODS' | 'COSMETIC' | 'CLOTHES' | 'OTHERS';
 export type PaymentMethod = 'CASH' | 'CARD' | 'QR';
 
 // ── API Response wrapper ──

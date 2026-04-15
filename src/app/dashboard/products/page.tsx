@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Search, Package, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Search, Package, ChevronLeft, ChevronRight } from "lucide-react";
 import { useProductStore } from "@/store/productStore";
 import { CATEGORY_CONFIG, Category } from "@/types/product";
 import { formatCurrency } from "@/lib/utils/pricing";
@@ -226,16 +226,8 @@ export default function ProductsPage() {
                         </td>
                         <td className="px-3 py-3 text-slate-400 sm:px-4">{product.unit}</td>
                         <td className="px-3 py-3 sm:px-4">
-                          <span
-                            className={clsx(
-                              "font-semibold tabular-nums",
-                              isLowStock ? "text-rose-400" : "text-slate-200"
-                            )}
-                          >
+                          <span className="font-semibold tabular-nums text-slate-200">
                             {product.quantity}
-                            {isLowStock && (
-                              <AlertTriangle className="ml-1 inline h-3.5 w-3.5 text-rose-400" />
-                            )}
                           </span>
                         </td>
                         <td className="px-3 py-3 text-slate-300 tabular-nums sm:px-4">

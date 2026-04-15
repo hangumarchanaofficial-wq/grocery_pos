@@ -8,8 +8,8 @@ type ApiProduct = Record<string, any>;
 const API_TO_APP_CATEGORY: Record<string, Product["category"]> = {
   VEGETABLES: "VEGETABLES",
   FRUITS: "FRUITS",
-  GROCERIES: "GROCERY_ITEMS",
-  GROCERY_ITEMS: "GROCERY_ITEMS",
+  GROCERIES: "GROCERIES",
+  GROCERY_ITEMS: "GROCERIES",
   FOODS: "FOODS",
   COSMETIC: "COSMETIC",
   CLOTHES: "CLOTHES",
@@ -20,7 +20,7 @@ const API_TO_APP_CATEGORY: Record<string, Product["category"]> = {
 const APP_TO_API_CATEGORY: Record<Product["category"], string> = {
   VEGETABLES: "VEGETABLES",
   FRUITS: "FRUITS",
-  GROCERY_ITEMS: "GROCERIES",
+  GROCERIES: "GROCERIES",
   FOODS: "FOODS",
   COSMETIC: "COSMETIC",
   CLOTHES: "CLOTHES",
@@ -132,7 +132,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   fetchProducts: async () => {
     set({ isLoading: true, error: null });
     try {
-      const res = await fetch("/api/products");
+      const res = await fetch("/api/products", { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
       const products = (data.products ?? data).map(mapApiProduct);
@@ -148,6 +148,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     try {
       const res = await fetch("/api/products", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(mapCreateProductInput(data)),
       });
@@ -175,6 +176,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       const currentProduct = get().products.find((product) => product.id === id);
       const res = await fetch(`/api/products/${id}`, {
         method: "PUT",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(mapUpdateProductInput(data, currentProduct)),
       });
@@ -198,7 +200,10 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   deleteProduct: async (id) => {
     try {
-      const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/products/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.error || err.message || "Failed to delete product");
@@ -219,7 +224,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     const prefixes: Record<string, string> = {
       VEGETABLES: "VEG",
       FRUITS: "FRT",
-      GROCERY_ITEMS: "GRC",
+      GROCERIES: "GRC",
       FOODS: "FDS",
       COSMETIC: "CSM",
       CLOTHES: "CLT",

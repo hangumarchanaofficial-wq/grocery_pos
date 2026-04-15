@@ -1,7 +1,7 @@
 export type Category =
   | "VEGETABLES"
   | "FRUITS"
-  | "GROCERY_ITEMS"
+  | "GROCERIES"
   | "FOODS"
   | "COSMETIC"
   | "CLOTHES"
@@ -62,7 +62,7 @@ export const CATEGORY_CONFIG: Record<
     quantityLabel: "Quantity (kg)",
     icon: "🍎",
   },
-  GROCERY_ITEMS: {
+  GROCERIES: {
     label: "Grocery Items",
     allowedUnits: ["PIECE", "PACK", "LITRE", "DOZEN"],
     defaultUnit: "PIECE",

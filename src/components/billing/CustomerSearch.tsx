@@ -23,6 +23,7 @@ export default function CustomerSearch() {
   const [showPanel, setShowPanel] = useState(false);
   const [page, setPage] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { apiFetch } = useAuth();
   const { setCustomer, customerName } = useCartStore();
   const { settings } = useSettingsStore();
@@ -40,7 +41,7 @@ export default function CustomerSearch() {
       try {
         const params = new URLSearchParams({
           search: trimmed,
-          limit: '200',
+          limit: '20',
         });
         const res = await apiFetch(`/api/customers?${params}`);
         const data = await res.json();
@@ -50,7 +51,8 @@ export default function CustomerSearch() {
           setPage(0);
           return;
         }
-        setResults(Array.isArray(data) ? data : []);
+        const list = Array.isArray(data) ? data : (data.customers ?? []);
+        setResults(list);
         setShowPanel(true);
         setPage(0);
       } catch {
@@ -63,9 +65,19 @@ export default function CustomerSearch() {
   );
 
   useEffect(() => {
-    const timer = setTimeout(() => searchCustomers(query), 300);
+    const timer = setTimeout(() => searchCustomers(query), 400);
     return () => clearTimeout(timer);
   }, [query, searchCustomers]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowPanel(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const maxPage = Math.max(0, Math.ceil(results.length / PAGE_SIZE) - 1);
   const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
@@ -120,7 +132,7 @@ export default function CustomerSearch() {
   const panelOpen = showPanel && query.trim().length >= 1;
 
   return (
-    <div className="flex flex-col gap-0">
+    <div ref={containerRef} className="flex flex-col gap-0">
       <Input
         ref={inputRef}
         placeholder="Name or phone..."

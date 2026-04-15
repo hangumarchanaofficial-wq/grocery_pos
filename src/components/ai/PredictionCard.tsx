@@ -1,27 +1,11 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
 import type { StockPrediction } from '@/types';
 import { TrendingDown, AlertTriangle, CheckCircle, Package, Sparkles } from 'lucide-react';
 
-export default function PredictionCard() {
-  const { apiFetch } = useAuth();
-  const [predictions, setPredictions] = useState<StockPrediction[]>([]);
-  const [loading, setLoading] = useState(true);
+type Props = { predictions: StockPrediction[]; loading: boolean };
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await apiFetch('/api/ai/predictions');
-        const data = await res.json();
-        setPredictions(data.predictions ?? []);
-      } catch { setPredictions([]); }
-      finally { setLoading(false); }
-    }
-    load();
-  }, [apiFetch]);
-
+export default function PredictionCard({ predictions, loading }: Props) {
   const urgent = predictions.filter(p => p.urgency !== 'ok').slice(0, 8);
 
   return (

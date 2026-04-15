@@ -1,8 +1,6 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { AlertTriangle, Clock, TrendingDown, Package, Shield, Bell, Sparkles } from 'lucide-react';
+import { AlertTriangle, Clock, TrendingDown, Package, Shield, Bell } from 'lucide-react';
 import type { SmartAlert } from '@/types';
 
 const ICON_MAP = { stockout: Package, expiry: Clock, low_selling: TrendingDown, reorder: AlertTriangle };
@@ -30,23 +28,9 @@ const STYLE_MAP = {
   },
 };
 
-export default function AlertsPanel() {
-  const { apiFetch } = useAuth();
-  const [alerts, setAlerts] = useState<SmartAlert[]>([]);
-  const [loading, setLoading] = useState(true);
+type Props = { alerts: SmartAlert[]; loading: boolean };
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await apiFetch('/api/ai/alerts');
-        const data = await res.json();
-        setAlerts(data.alerts ?? []);
-      } catch { setAlerts([]); }
-      finally { setLoading(false); }
-    }
-    load();
-  }, [apiFetch]);
-
+export default function AlertsPanel({ alerts, loading }: Props) {
   return (
     <div className="premium-card animate-fade-up rounded-[20px] sm:rounded-[24px] p-4 sm:p-6">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/25 to-transparent" />

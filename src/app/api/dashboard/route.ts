@@ -1,6 +1,36 @@
 import { adminClient } from '@/lib/supabase/admin';
 import { getUserFromRequest, errorResponse, successResponse } from '@/lib/auth';
 
+type LowStockRow = {
+  id: string;
+  name: string;
+  quantity: number;
+  min_stock: number;
+  category: string | null;
+};
+
+async function lowStockFallback(): Promise<{ count: number; rows: LowStockRow[] }> {
+  const { data: allProducts } = await adminClient
+    .from('products')
+    .select('id, name, quantity, min_stock, category')
+    .eq('active', true);
+  const rows = (allProducts || []).filter(
+    (p: { quantity: number; min_stock: number }) => p.quantity <= p.min_stock
+  ) as LowStockRow[];
+  return { count: rows.length, rows };
+}
+
+async function loadLowStockFromRpc(): Promise<{ count: number; rows: LowStockRow[] }> {
+  const [{ data: cnt, error: cntErr }, { data: list, error: listErr }] = await Promise.all([
+    adminClient.rpc('count_low_stock_products'),
+    adminClient.rpc('get_low_stock_products'),
+  ]);
+  if (!cntErr && (typeof cnt === 'number' || typeof cnt === 'bigint') && !listErr && Array.isArray(list)) {
+    return { count: Number(cnt), rows: list as LowStockRow[] };
+  }
+  return lowStockFallback();
+}
+
 export async function GET() {
   const user = await getUserFromRequest();
   if (!user) return errorResponse('Unauthorized', 401);
@@ -14,7 +44,7 @@ export async function GET() {
   const [
     { data: todayBills },
     { count: totalProducts },
-    { data: allProducts },
+    lowStockRpc,
     { data: expiringProducts },
     { data: recentBills },
     { data: last7Days },
@@ -25,8 +55,7 @@ export async function GET() {
       .lte('created_at', todayEnd.toISOString()),
     adminClient.from('products')
       .select('*', { count: 'exact', head: true }).eq('active', true),
-    adminClient.from('products')
-      .select('id, name, quantity, min_stock, category').eq('active', true),
+    loadLowStockFromRpc(),
     adminClient.from('products')
       .select('id, name, expiry_date, quantity, category')
       .eq('active', true)
@@ -47,10 +76,6 @@ export async function GET() {
     const cost = b.bill_items.reduce((a, i) => a + i.cost_price * i.quantity, 0);
     return s + rev - cost;
   }, 0);
-
-  const actualLowStock = (allProducts || []).filter(
-    (p: { quantity: number; min_stock: number }) => p.quantity <= p.min_stock
-  );
 
   const salesByDay: Record<string, { sales: number; profit: number; bills: number }> = {};
   for (let i = 6; i >= 0; i--) {
@@ -77,10 +102,10 @@ export async function GET() {
       todayBills:    bills.length,
       todayProfit:   Math.round(todayProfit  * 100) / 100,
       totalProducts: totalProducts || 0,
-      lowStockCount: actualLowStock.length,
+      lowStockCount: lowStockRpc.count,
       expiringCount: (expiringProducts || []).length,
     },
-    lowStockProducts:  actualLowStock,
+    lowStockProducts:  lowStockRpc.rows,
     expiringProducts:  expiringProducts  || [],
     recentBills:       recentBills       || [],
     chartData,

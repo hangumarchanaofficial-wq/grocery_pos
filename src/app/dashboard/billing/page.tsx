@@ -27,6 +27,27 @@ import {
 import { toast } from 'react-hot-toast';
 import { formatCurrency } from '@/lib/utils';
 
+const TILE_STYLES: Record<
+  'emerald' | 'sky' | 'violet',
+  { wrap: string; iconWrap: string; icon: string }
+> = {
+  emerald: {
+    wrap: 'border-emerald-400/20 bg-emerald-500/10 hover:bg-emerald-500/[0.15]',
+    iconWrap: 'bg-emerald-500/10',
+    icon: 'text-emerald-400',
+  },
+  sky: {
+    wrap: 'border-sky-400/20 bg-sky-500/10 hover:bg-sky-500/[0.15]',
+    iconWrap: 'bg-sky-500/10',
+    icon: 'text-sky-400',
+  },
+  violet: {
+    wrap: 'border-violet-400/20 bg-violet-500/10 hover:bg-violet-500/[0.15]',
+    iconWrap: 'bg-violet-500/10',
+    icon: 'text-violet-400',
+  },
+};
+
 export default function BillingPage() {
   const { submitBill } = useCart();
   const { items } = useCartStore();
@@ -85,15 +106,18 @@ export default function BillingPage() {
               { icon: ScanLine, color: 'emerald', label: 'Scanner', sub: 'Barcode + manual' },
               { icon: WalletCards, color: 'sky', label: 'Payments', sub: 'Cash, card, QR' },
               { icon: Zap, color: 'violet', label: 'Express', sub: 'One-click checkout' },
-            ].map((tile) => (
-              <div key={tile.label} className={`rounded-[12px] sm:rounded-[16px] border border-${tile.color}-400/20 bg-${tile.color}-500/10 p-2.5 sm:p-4 transition-all duration-300 hover:bg-${tile.color}-500/[0.15]`}>
-                <div className={`mb-1.5 sm:mb-3 flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-[8px] sm:rounded-[10px] bg-${tile.color}-500/10`}>
-                  <tile.icon size={13} className={`text-${tile.color}-400 sm:[&]:w-[15px] sm:[&]:h-[15px]`} />
+            ].map((tile) => {
+              const st = TILE_STYLES[tile.color as keyof typeof TILE_STYLES];
+              return (
+              <div key={tile.label} className={`rounded-[12px] sm:rounded-[16px] border p-2.5 sm:p-4 transition-all duration-300 ${st.wrap}`}>
+                <div className={`mb-1.5 sm:mb-3 flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-[8px] sm:rounded-[10px] ${st.iconWrap}`}>
+                  <tile.icon size={13} className={`${st.icon} sm:[&]:w-[15px] sm:[&]:h-[15px]`} />
                 </div>
                 <p className="text-[10px] sm:text-[11px] font-semibold text-slate-200">{tile.label}</p>
                 <p className="mt-0.5 text-[9px] sm:text-[10px] leading-relaxed text-slate-600 hidden sm:block">{tile.sub}</p>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

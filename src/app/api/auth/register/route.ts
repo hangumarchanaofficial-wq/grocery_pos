@@ -16,7 +16,7 @@ export async function POST(req: Request) {
 
   const { data: profile, error: profileErr } = await adminClient
     .from('users')
-    .insert({ id: authData.user.id, name, role })
+    .insert({ id: authData.user.id, name, email, role })
     .select()
     .single();
 

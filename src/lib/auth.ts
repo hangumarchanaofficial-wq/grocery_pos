@@ -8,11 +8,29 @@ export interface AuthUser {
   active: boolean;
 }
 
+function authUserFromMetadata(user: {
+  id: string;
+  email?: string | null;
+  user_metadata?: Record<string, unknown> | null;
+}): AuthUser | null {
+  const m = user.user_metadata;
+  if (!m) return null;
+  const role = m.role;
+  if (role !== 'OWNER' && role !== 'MANAGER' && role !== 'CASHIER') return null;
+  const name = typeof m.name === 'string' && m.name.trim() ? m.name : (user.email ?? 'User');
+  const active = m.active !== false;
+  if (!active) return null;
+  return { id: user.id, name, role, active: true };
+}
+
 export async function getUserFromRequest(): Promise<AuthUser | null> {
   try {
     const supabase = await createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) return null;
+
+    const fromMeta = authUserFromMetadata(user);
+    if (fromMeta) return fromMeta;
 
     const admin = getAdminClient();
     if (!admin) return null;

@@ -32,6 +32,7 @@ export default function ProductSearch() {
   const [showResults, setShowResults] = useState(false);
   const [page, setPage] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { apiFetch } = useAuth();
   const addItem = useCartStore((s) => s.addItem);
 
@@ -63,9 +64,19 @@ export default function ProductSearch() {
   }, [apiFetch]);
 
   useEffect(() => {
-    const timer = setTimeout(() => searchProducts(query), 300);
+    const timer = setTimeout(() => searchProducts(query), 400);
     return () => clearTimeout(timer);
   }, [query, searchProducts]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const maxPage = Math.max(0, Math.ceil(results.length / PAGE_SIZE) - 1);
   const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
@@ -102,7 +113,7 @@ export default function ProductSearch() {
   };
 
   return (
-    <div className="flex flex-col gap-0">
+    <div ref={containerRef} className="flex flex-col gap-0">
       <Input
         ref={inputRef}
         placeholder="Search product or barcode..."

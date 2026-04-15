@@ -18,7 +18,7 @@ export const createProductSchema = z
     category: z.enum([
       "VEGETABLES",
       "FRUITS",
-      "GROCERY_ITEMS",
+      "GROCERIES",
       "FOODS",
       "COSMETIC",
       "CLOTHES",

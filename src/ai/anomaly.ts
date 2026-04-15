@@ -2,7 +2,7 @@
 // Anomaly Detection — unusual discount patterns, bill spikes,
 // product sales drops. Uses standard deviation (simple-statistics)
 // ============================================================
-import { mean, standardDeviation } from 'simple-statistics';
+import { mean, standardDeviation } from '@/lib/stats';
 import { adminClient } from '@/lib/supabase/admin';
 
 export interface AnomalyFlag {

@@ -4,7 +4,7 @@
 // using simple linear regression on daily sales data.
 // ============================================================
 
-import { linearRegression } from 'simple-statistics';
+import { linearRegression } from '@/lib/stats';
 import type { SalesInsight } from '@/types';
 
 interface ProductData {

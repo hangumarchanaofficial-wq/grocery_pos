@@ -1,5 +1,6 @@
 ﻿import { adminClient } from '@/lib/supabase/admin';
 import { getUserFromRequest, hasRole, errorResponse, successResponse } from '@/lib/auth';
+import { sanitizeIlikePattern } from '@/lib/sanitizeSearch';
 import { transformRows, transformRow } from '@/lib/utils';
 
 export async function GET(req: Request) {
@@ -19,7 +20,10 @@ export async function GET(req: Request) {
     .order('name')
     .range((page - 1) * limit, page * limit - 1);
 
-  if (search) query = query.or(`name.ilike.%${search}%,barcode.ilike.%${search}%`);
+  if (search) {
+    const q = sanitizeIlikePattern(search);
+    if (q) query = query.or(`name.ilike.%${q}%,barcode.ilike.%${q}%`);
+  }
   if (category) query = query.eq('category', category);
 
   const { data, count, error } = await query;

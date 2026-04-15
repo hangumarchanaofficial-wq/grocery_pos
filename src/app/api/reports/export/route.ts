@@ -1,5 +1,6 @@
 ﻿import { adminClient } from '@/lib/supabase/admin';
 import { getUserFromRequest, hasRole, errorResponse } from '@/lib/auth';
+import { sanitizeCsvCell } from '@/lib/csv';
 
 export async function GET(req: Request) {
   const user = await getUserFromRequest();
@@ -27,7 +28,7 @@ export async function GET(req: Request) {
       (b.bill_items as { quantity: number; products: { name: string } }[])?.map((i) => i.products?.name + ' x' + i.quantity).join('; '),
       b.subtotal, b.tax, b.discount, b.total, b.payment_method,
       (b.users as { name?: string } | null)?.name,
-    ].map((c) => '"' + String(c ?? '').replace(/"/g, '""') + '"').join(',')
+    ].map((c) => '"' + sanitizeCsvCell(String(c ?? '')).replace(/"/g, '""') + '"').join(',')
   );
 
   return new Response(headers + rows.join('\n'), {

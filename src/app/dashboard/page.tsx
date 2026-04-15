@@ -1,15 +1,31 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/hooks/useAuth';
+import { useDashboardAI } from '@/contexts/DashboardAIContext';
 import StatsCards from '@/components/dashboard/StatsCards';
-import SalesChart from '@/components/dashboard/SalesChart';
-import TopProducts from '@/components/dashboard/TopProducts';
-import AlertsPanel from '@/components/dashboard/AlertsPanel';
-import PredictionCard from '@/components/ai/PredictionCard';
-import { ShoppingCart, Package, Brain, Activity, Zap, Clock, Target, Sparkles, TrendingUp, Shield } from 'lucide-react';
+import DashboardHeroClock from '@/components/dashboard/DashboardHeroClock';
+import { ShoppingCart, Package, Brain, Zap, Target, TrendingUp, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+
+const SalesChart = dynamic(() => import('@/components/dashboard/SalesChart'), {
+  ssr: false,
+  loading: () => <div className="h-52 sm:h-72 animate-pulse rounded-2xl bg-white/[0.03]" />,
+});
+const AlertsPanel = dynamic(() => import('@/components/dashboard/AlertsPanel'), {
+  ssr: false,
+  loading: () => <div className="min-h-[120px] animate-pulse rounded-2xl bg-white/[0.03] sm:min-h-[140px]" />,
+});
+const PredictionCard = dynamic(() => import('@/components/ai/PredictionCard'), {
+  ssr: false,
+  loading: () => <div className="min-h-[180px] animate-pulse rounded-2xl bg-white/[0.03] sm:min-h-[220px]" />,
+});
+const TopProducts = dynamic(() => import('@/components/dashboard/TopProducts'), {
+  ssr: false,
+  loading: () => <div className="min-h-[180px] animate-pulse rounded-2xl bg-white/[0.03] sm:min-h-[220px]" />,
+});
 
 const FALLBACK = {
   stats: { todaySales: 0, todayBills: 0, todayProfit: 0, totalProducts: 0, lowStockCount: 0, expiringCount: 0 },
@@ -25,16 +41,6 @@ const FALLBACK = {
 };
 
 type DashboardData = typeof FALLBACK;
-
-/** Tailwind cannot emit dynamic `bg-${color}-*` strings; use explicit maps for mobile + desktop. */
-const STATUS_MINI: Record<
-  'emerald' | 'sky' | 'violet',
-  { iconWrap: string; icon: string }
-> = {
-  emerald: { iconWrap: 'bg-emerald-500/10', icon: 'text-emerald-400' },
-  sky: { iconWrap: 'bg-sky-500/10', icon: 'text-sky-400' },
-  violet: { iconWrap: 'bg-violet-500/10', icon: 'text-violet-400' },
-};
 
 const INTEL_ROW: Record<
   'amber' | 'emerald' | 'sky',
@@ -59,14 +65,9 @@ const INTEL_ROW: Record<
 
 export default function DashboardPage() {
   const { apiFetch, user } = useAuth();
+  const { aiData, loading: aiLoading } = useDashboardAI();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [time, setTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 60000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     async function load() {
@@ -93,7 +94,8 @@ export default function DashboardPage() {
     </div>
   );
 
-  const greeting = time.getHours() < 12 ? 'Good morning' : time.getHours() < 17 ? 'Good afternoon' : 'Good evening';
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   const firstName = user?.name?.split(' ')[0] ?? 'there';
   const showManageStock = ['OWNER', 'MANAGER'].includes(user?.role ?? '');
 
@@ -130,7 +132,7 @@ export default function DashboardPage() {
                   showManageStock ? 'grid-cols-2' : 'grid-cols-1'
                 )}
               >
-                <Link href="/dashboard/billing" className="min-w-0">
+                <Link href="/dashboard/billing" prefetch={true} className="min-w-0">
                   <button
                     type="button"
                     className="flex w-full min-w-0 items-center justify-center gap-2 rounded-[12px] sm:rounded-[14px] bg-emerald-500 px-3 sm:px-5 py-2.5 text-[12px] sm:text-sm font-semibold text-slate-950 shadow-[0_8px_32px_rgba(34,197,94,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_12px_40px_rgba(34,197,94,0.4)] active:scale-[0.97]"
@@ -150,28 +152,7 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
-            {/* Mini status cards */}
-            <div className="grid w-full grid-cols-3 gap-2 sm:gap-2.5 lg:w-[240px] lg:grid-cols-1">
-              {([
-                { label: 'Register', value: 'Online', sub: 'Syncing live', icon: Activity, color: 'emerald' as const },
-                { label: 'Time', value: time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }), sub: time.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }), icon: Clock, color: 'sky' as const },
-                { label: 'AI Engine', value: 'Active', sub: 'Predictions live', icon: Sparkles, color: 'violet' as const },
-              ]).map((card) => {
-                const st = STATUS_MINI[card.color];
-                return (
-                  <div key={card.label} className="rounded-[10px] sm:rounded-[14px] border border-white/[0.06] bg-white/[0.025] p-2.5 sm:p-3.5 transition-all duration-300 hover:bg-white/[0.04]">
-                    <div className="mb-1.5 sm:mb-2.5 flex items-center justify-between">
-                      <span className="text-[7px] sm:text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500">{card.label}</span>
-                      <div className={`flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-md sm:rounded-lg ${st.iconWrap}`}>
-                        <card.icon size={10} className={`${st.icon} sm:w-3 sm:h-3`} />
-                      </div>
-                    </div>
-                    <p className="text-[11px] sm:text-[13px] font-semibold tabular-nums text-slate-100">{card.value}</p>
-                    <p className="mt-0.5 text-[9px] sm:text-[10px] text-slate-600">{card.sub}</p>
-                  </div>
-                );
-              })}
-            </div>
+            <DashboardHeroClock />
           </div>
         </div>
 
@@ -221,13 +202,13 @@ export default function DashboardPage() {
       <SalesChart data={data?.chartData} />
 
       {/* ALERTS */}
-      <AlertsPanel />
+      <AlertsPanel alerts={aiData?.alerts ?? []} loading={aiLoading} />
 
       {/* STOCK PREDICTIONS + TOP PRODUCTS */}
       {['OWNER', 'MANAGER'].includes(user?.role ?? '') && (
         <>
-          <PredictionCard />
-          <TopProducts />
+          <PredictionCard predictions={aiData?.predictions ?? []} loading={aiLoading} />
+          <TopProducts insights={aiData?.insights ?? []} loading={aiLoading} />
         </>
       )}
 

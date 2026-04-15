@@ -55,6 +55,7 @@ export default function SettingsPage() {
     try {
       const res = await apiFetch('/api/auth/register', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
       if (!res.ok) {

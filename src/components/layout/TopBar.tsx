@@ -4,10 +4,9 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Menu, Bell, ShoppingCart, Zap } from 'lucide-react';
+import { Menu, Bell, ShoppingCart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import Badge from '@/components/ui/Badge';
+import { useDashboardAI } from '@/contexts/DashboardAIContext';
 import { cn } from '@/lib/utils';
 
 interface TopBarProps {
@@ -17,19 +16,8 @@ interface TopBarProps {
 }
 
 export default function TopBar({ onMenuToggle, menuOpen = false }: TopBarProps) {
-  const { user, apiFetch } = useAuth();
-  const [alertCount, setAlertCount] = useState(0);
-
-  useEffect(() => {
-    async function fetchAlerts() {
-      try {
-        const res = await apiFetch('/api/ai/alerts');
-        const data = await res.json();
-        setAlertCount(data.summary?.critical + data.summary?.warning || 0);
-      } catch { /* ignore */ }
-    }
-    fetchAlerts();
-  }, [apiFetch]);
+  const { user } = useAuth();
+  const { urgentAlertCount } = useDashboardAI();
 
   return (
     <header
@@ -68,9 +56,9 @@ export default function TopBar({ onMenuToggle, menuOpen = false }: TopBarProps) 
           {/* Notification */}
           <button className="relative rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white">
             <Bell size={18} />
-            {alertCount > 0 && (
+            {urgentAlertCount > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white ring-2 ring-[var(--bg)]">
-                {alertCount > 9 ? '9+' : alertCount}
+                {urgentAlertCount > 9 ? '9+' : urgentAlertCount}
               </span>
             )}
           </button>

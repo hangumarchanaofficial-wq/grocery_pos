@@ -19,6 +19,8 @@ import type { CategoryScore } from './categoryScore';
 import type { DailySummary } from './dailySummary';
 import type { PricingSuggestion } from './pricingSuggestions';
 
+export type AnalysisScope = 'dashboard' | 'full';
+
 export interface AIAnalysis {
   predictions:        StockPrediction[];
   insights:           SalesInsight[];
@@ -32,7 +34,17 @@ export interface AIAnalysis {
   generatedAt:        string;
 }
 
-export async function runFullAnalysis(): Promise<AIAnalysis> {
+const EMPTY_DAILY_SUMMARY: DailySummary = {
+  en: '',
+  si: '',
+  highlights: [],
+  generatedAt: new Date().toISOString(),
+};
+
+export async function runFullAnalysis(options?: { scope?: AnalysisScope }): Promise<AIAnalysis> {
+  const scope: AnalysisScope = options?.scope ?? 'full';
+  const runHeavyAsync = scope === 'full';
+
   const [
     { data: salesData },
     { data: products },
@@ -74,9 +86,24 @@ export async function runFullAnalysis(): Promise<AIAnalysis> {
     expiryDate: p.expiry_date ? new Date(p.expiry_date) : null,
   }));
 
-  const predictions        = generatePredictions(mappedProducts, salesMap);
-  const insights           = generateInsights(mappedProducts, salesMap, dailySalesByProduct);
-  const alerts             = generateAlerts(mappedProducts, salesMap, predictions);
+  const predictions = generatePredictions(mappedProducts, salesMap);
+  const insights    = generateInsights(mappedProducts, salesMap, dailySalesByProduct);
+  const alerts      = generateAlerts(mappedProducts, salesMap, predictions);
+
+  if (!runHeavyAsync) {
+    return {
+      predictions,
+      insights,
+      alerts,
+      basket:             [],
+      customerInsights:   [],
+      anomalies:          [],
+      categoryScores:     [],
+      dailySummary:       EMPTY_DAILY_SUMMARY,
+      pricingSuggestions: [],
+      generatedAt:        new Date().toISOString(),
+    };
+  }
 
   const [basket, customerInsights, anomalies, categoryScores, dailySummary, pricingSuggestions] =
     await Promise.all([
